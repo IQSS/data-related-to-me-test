@@ -38,6 +38,7 @@ class DataRelatedToMe(object):
         self.load_roles()
         self.load_dvobject_info()
 
+
     def get_total_object_count(self):
 
         return len(self.get_dataverse_ids())\

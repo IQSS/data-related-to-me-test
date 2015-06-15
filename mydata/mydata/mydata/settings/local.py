@@ -26,6 +26,8 @@ DATABASES = {
     }
 }
 
+SOLR_URL = 'http://localhost:8983/solr/'
+
 
 SESSION_COOKIE_NAME = 'mydata_local'
 

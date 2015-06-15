@@ -84,5 +84,5 @@ python manage.py runserver
 
 ### Step 1 (from [google doc](https://docs.google.com/a/harvard.edu/document/d/1UcCtsPMxfHBd9ncXsFhbaofzkgn1NyiGzrZ0b0KqlWU/edit?usp=sharing))
 
-- Go to: http://127.0.0.1:8000/step1/dataverseAdmin
+- Go to: http://127.0.0.1:8000/step1/db-roles/
    - ```dataverseAdmin``` may be any username

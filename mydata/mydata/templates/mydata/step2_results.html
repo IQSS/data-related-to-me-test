@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block maincontent %}
+<a name="top"></a>
+
+<h1>Solr Queries</h1>
+<h3>Username: <span style="color:#006699;">{{ username }}</span></h3>
+
+<hr />
+
+<div class="row">
+    <div class="col-md-12">
+     <p> <b>Count:</b> {{ d2me.all_dataverse_ids|length }}
+      <br /> <b>Dataverse ids:</b> {{ d2me.all_dataverse_ids }}
+        </p>
+     <p>{{ solr_helper.get_dataverse_query_fragment }}</p>
+
+    </div>
+    <div class="col-md-12">
+        <p>num results: {{ solr_results.hits }}</p>
+        <p>facets: {{ solr_results.facets }}</p>
+
+        {% for doc in solr_results.docs %}
+            {% if doc.dvObjectType == 'dataverses' %}
+                <div class="panel panel-default">
+                  <div class="panel-heading">{{ doc.name }} (dataverse)</div>
+                  <div class="panel-body">
+                       {% for publication_status in doc.publicationStatus %}
+                        {% include "publication_status.html" %}
+                      {% endfor %}
+                      <hr />
+                      <p><b>dateFriendly:</b> {{ doc.dateFriendly }} - {{ doc.parentName }}</p>
+                      <p><b>identifier:</b> {{ doc.identifier }}</p>
+
+                        {{ doc.description }}
+                    <hr />{{ doc }}
+                  </div>
+                </div>
+            {% endif %}
+
+            {% if doc.dvObjectType == 'datasets' %}
+                <div class="panel panel-default">
+                  <div class="panel-heading">{{ doc.title }} (dataset)</div>
+                  <div class="panel-body">
+                      {% for publication_status in doc.publicationStatus %}
+                        {% include "publication_status.html" %}
+                      {% endfor %}
+                      <hr />
+
+                       <p><b>dateFriendly:</b> {{ doc.dateFriendly }} - {{ doc.parentName }}</p>
+                       <p><b>description:</b> {{ doc.dsDescriptionValue.0 }}</p>
+                       <p><b>persistent id:</b> {{ doc.dsPersistentId }}</p>
+                       <p><b>persistentUrl:</b> <a href="{{ doc.persistentUrl }}">{{ doc.persistentUrl }}</a></p>
+                       <p><b>publicationCitation:</b> {{ doc.publicationCitation.0 }}</p>
+
+                    {#{ doc }#}
+
+                  </div>
+                </div>
+            {% endif %}
+
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
