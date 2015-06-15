@@ -50,6 +50,28 @@ pip install -r requirements/base.txt
 
 If you run into Xcode (or other errors) when running the install, google it.  Sometimes the [Xcode license agreement hasn't been accepted](http://stackoverflow.com/questions/26197347/agreeing-to-the-xcode-ios-license-requires-admin-privileges-please-re-run-as-r/26197363#26197363)
 
+#### Set postactivate variable
+
+- Open the postactivate script (in any editor--example below is ```vim```)
+```
+vim $VIRTUAL_ENV/bin/postactivate
+```
+
+- Add these lines to the bottom, save file, and return to the Terminal
+```
+export DJANGO_DEBUG=True
+export DJANGO_SETTINGS_MODULE=mydata.settings.local
+```
+
+- Test it:
+```
+deactivate
+workon mydata
+echo $DJANGO_SETTINGS_MODULE
+```
+
+You should have seen: ```mydata.settings.local```
+ 
 
 ## Working with the project (post installation)
 
