@@ -28,17 +28,21 @@ class MyDataFilterForm(forms.Form):
     ROLE_CHOICES = [ (id_num, x) for id_num, x in enumerate(ROLES, 1)]
     # ------------------------------------------------------
 
+    search_term = forms.CharField(required=False)
 
     is_filter_form = forms.CharField(widget=forms.HiddenInput, initial=1)
 
     dvobject_types = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple,
-                                             choices=DVOBJECT_TYPE_CHOICES)
+                                             choices=DVOBJECT_TYPE_CHOICES,
+                                             initial=[x for x, y in DVOBJECT_TYPE_CHOICES[:2]])
 
     publication_statuses = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple,
-                                             choices=PUBLICATION_STATUS_CHOICES)
+                                             choices=PUBLICATION_STATUS_CHOICES,
+                                             initial=PUBLICATION_STATUSES)
 
     roles = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple,
-                                             choices=ROLE_CHOICES)
+                                     choices=ROLE_CHOICES,
+                                      initial=[x for x, y in ROLE_CHOICES])
 
 
 
