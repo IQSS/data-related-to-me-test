@@ -45,7 +45,7 @@
                     <td>{% if item == True %}
                         <span class="label label-success">Yes</span>
                     {% else %}
-                        <span class="label label-info">No</span>
+                        <span class="label label-default">No</span>
                     {% endif %}
 
                     </td>
@@ -65,7 +65,9 @@
                 <h3 class="panel-title">SQL query 1: Direct Assignments</h3>
             </div>
             <div class="panel-body">
-               {{ solr_query1 }}
+
+                {{ pqh.step1_query }}
+                {#{ filter_form.get_sql_01_role_assignment_query }#}
           </div>
         </div>
         <div class="panel panel-default">
@@ -73,7 +75,15 @@
                 <h3 class="panel-title">SQL query 2: DvObjects from Direct Assignments</h3>
             </div>
             <div class="panel-body">
-              {{ filter_form.get_sql02_direct_assignments }}
+                {{ filter_form.get_sql02_direct_assignments }}
+              <hr />
+                <b>With {{ pqh.dvobject_direct_ids|length }} dvobject id{{ pqh.dvobject_direct_ids|length|pluralize }}:</b><br />
+                {{ pqh.step2_query }}
+             <hr />
+                <b>Dataverses: </b>{{ pqh.all_dataverse_ids|length }}
+                <br /><b>Datasets: </b>{{ pqh.initial_dataset_ids|length }}
+                <br /><b>Files: </b>{{ pqh.initial_file_ids|length }}
+
           </div>
         </div>
 
@@ -83,12 +93,23 @@
             </div>
             <div class="panel-body">
               {{ filter_form.get_sql03_indirect_datasets }}
+                             <hr />
+
+                <b>With {{ pqh.all_dataverse_ids|length }} dataverse id{{ pqh.all_dataverse_ids|length|pluralize }}:</b><br />
+
+                                {{ pqh.step3_query }}
+
+              <hr />
+                <b>Dataverses: </b>{{ pqh.all_dataverse_ids|length }}
+                <br /><b>Datasets: </b> {{ pqh.all_dataset_ids|length }}  (initial: {{ pqh.initial_dataset_ids|length }})
+                <br /><b>Files: </b>{{ pqh.initial_file_ids|length }}
+
           </div>
         </div>
 
         <div class="panel panel-default">
             <div class="panel-heading">
-                <h3 class="panel-title">SQL query 4: Indirect Files</h3>
+                <h3 class="panel-title">SQL query 4: Indirect Files based on Dataverse and Dataset permissions</h3>
             </div>
             <div class="panel-body">
               {{ filter_form.get_sql04_indirect_files }}

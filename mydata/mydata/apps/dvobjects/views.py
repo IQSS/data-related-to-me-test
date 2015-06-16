@@ -3,6 +3,7 @@ from django.shortcuts import render, render_to_response
 from django.http import HttpResponse
 from apps.utils.msg_util import *
 from data_related_to_me import DataRelatedToMe
+from permissions_query_helper import PermissionsQueryHelper
 from .forms import MyDataFilterForm
 from apps.solr_docs.solr_helper import SolrHelper
 
@@ -34,8 +35,13 @@ def view_solr_results(request, username=None):
         if filter_form.is_valid():
             is_valid_form = True#= filter_form.get_solr_facet_query()
 
-            d.update(dict(solr_query1=filter_form.get_sql_01_role_assignment_query(username)))
+            pqh = PermissionsQueryHelper(username, filter_form)
+            pqh.run_queries()
+
+            d.update(dict(pqh=pqh))
+
             msgt('filter_form: %s' % filter_form.cleaned_data)
+
     else:
         filter_form = MyDataFilterForm()
 

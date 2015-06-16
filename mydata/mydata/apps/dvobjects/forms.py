@@ -117,7 +117,7 @@ class MyDataFilterForm(forms.Form):
         return """ AND dv.dtype in (%s)""" % value_str
 
 
-    def get_sql_01_role_assignment_query(self, username):
+    def get_sql_01_role_assignment_query(self, username="--username here--"):
 
         return """SELECT r.id, r.assigneeidentifier, r.definitionpoint_id, r.role_id
 FROM roleassignment r
