@@ -171,3 +171,15 @@ WHERE substr(r.assigneeidentifier, 2)= '%s'%s;""" % (username,
         sql_str += """ AND dv.dtype IN ('DataFile');"""
 
         return sql_str
+
+    def get_direct_indirect_grid(self):
+
+        direct_row = [ self.are_files_included() or self.are_datasets_included() or self.are_dataverses_included(),
+                       self.are_files_included() or self.are_datasets_included(),
+                       self.are_files_included()
+                       ]
+        indirect_row = [ False,
+                        self.are_files_included() or self.are_datasets_included(),
+                        self.are_files_included()
+                         ]
+        return [direct_row, indirect_row]

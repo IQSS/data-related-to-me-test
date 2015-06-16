@@ -3,49 +3,100 @@
 {% block maincontent %}
 <a name="top"></a>
 
-<h1>Solr Queries</h1>
+<h2>Data Related to Me: Postgres/Solr Queries</h2>
+
 <h3>Username: <span style="color:#006699;">{{ username }}</span></h3>
 
 <hr />
 
 <div class="row">
-    <form method="get" action="{% url 'view_solr_results' %}">
     <div class="col-md-4">
+    <form method="get" action="{% url 'view_solr_results' %}">
         <table class="table table-condensed">
 
             {{ filter_form }}
 
+            <tr><td colspan="2" class="text-center"><input type="reset">
+            <input type="submit"></td></tr>
         </table>
+           <hr />
+
+        </form>
     </div>
     <div class="col-md-6">
         {% if is_valid_form %}
+            <table class="table table-bordered table-condensed text-center">
+            <thead>
+                <tr class="text-center">
+                    <th>&nbsp;</th>
+                    <th>Dataverses</th>
+                    <th>Datasets</th>
+                    <th>DataFiles</th>
+                </tr>
+            </thead>
+            {% for row in filter_form.get_direct_indirect_grid %}
+            <tr>
+                {% if forloop.first %}
+                    <td><b>Direct</b><br />(one query)</td>
+                {% else %}
+                    <td><b>Indirect*</b><br />(query for each)</td>
+                {% endif %}
+                {% for item in row %}
+                    <td>{% if item == True %}
+                        <span class="label label-success">Yes</span>
+                    {% else %}
+                        <span class="label label-info">No</span>
+                    {% endif %}
+
+                    </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+
+        </table>
+
+
         <p><b>solr_query_from_form:</b>
             <br />{{ filter_form.get_solr_facet_query }}</p>
-        <p><b>SQL query1:</b> Direct Assignments
-            <br />{{ solr_query1 }}
-            <br /></p>
 
-        <p><b>SQL query2:</b> DvObjects from Direct Assignments
-            <br />{{ filter_form.get_sql02_direct_assignments }}
-            <br /></p>
 
-        <p><b>SQL query3:</b> Indirect Datasets based on Dataverse permissions
-            <br />{{ filter_form.get_sql03_indirect_datasets }}
-            <br /></p>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">SQL query 1: Direct Assignments</h3>
+            </div>
+            <div class="panel-body">
+               {{ solr_query1 }}
+          </div>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">SQL query 2: DvObjects from Direct Assignments</h3>
+            </div>
+            <div class="panel-body">
+              {{ filter_form.get_sql02_direct_assignments }}
+          </div>
+        </div>
 
-        <p><b>SQL query4:</b> Indirect Files
-            <br />{{ filter_form.get_sql04_indirect_files }}
-            <br /></p>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">SQL query 3: Indirect Datasets based on Dataverse permissions</h3>
+            </div>
+            <div class="panel-body">
+              {{ filter_form.get_sql03_indirect_datasets }}
+          </div>
+        </div>
 
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">SQL query 4: Indirect Files</h3>
+            </div>
+            <div class="panel-body">
+              {{ filter_form.get_sql04_indirect_files }}
+          </div>
+        </div>
 
         {% endif %}
-            <hr />
-            <input type="reset">
-            <input type="submit">
-    </div>
-    </form>
-    <div class="col-md-12">
-        <hr /><hr />
+
     </div>
 </div>
 <div class="row">
