@@ -25,12 +25,16 @@ def view_solr_results(request, username=None):
     if username is None:
         username = 'dataverseAdmin'
 
+    d = dict(username=username)
+
     is_valid_form = False
 
     if 'is_filter_form' in request.GET:
         filter_form = MyDataFilterForm(request.GET)
         if filter_form.is_valid():
             is_valid_form = True#= filter_form.get_solr_facet_query()
+
+            d.update(dict(solr_query1=filter_form.get_sql_01_role_assignment_query(username)))
             msgt('filter_form: %s' % filter_form.cleaned_data)
     else:
         filter_form = MyDataFilterForm()
@@ -40,15 +44,11 @@ def view_solr_results(request, username=None):
     solr_helper = SolrHelper(d2me)
     solr_results = solr_helper.make_dataverse_query()
 
-
-
-    d = dict(username=username,
-             d2me=d2me,
+    d.update(dict(d2me=d2me,
              solr_helper=solr_helper,
              solr_results=solr_results,
              filter_form=filter_form,
-             is_valid_form=is_valid_form
-             )
+             is_valid_form=is_valid_form))
 
     return render_to_response('mydata/step2_results.html', d)
 

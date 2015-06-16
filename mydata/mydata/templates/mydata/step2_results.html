@@ -11,14 +11,33 @@
 <div class="row">
     <form method="get" action="{% url 'view_solr_results' %}">
     <div class="col-md-4">
+        <table class="table table-condensed">
+
             {{ filter_form }}
+
+        </table>
     </div>
     <div class="col-md-6">
         {% if is_valid_form %}
         <p><b>solr_query_from_form:</b>
             <br />{{ filter_form.get_solr_facet_query }}</p>
-        <p><b>sql role query:</b>
-            <br />{{ filter_form.get_sql_role_query_fragment }}</p>
+        <p><b>SQL query1:</b> Direct Assignments
+            <br />{{ solr_query1 }}
+            <br /></p>
+
+        <p><b>SQL query2:</b> DvObjects from Direct Assignments
+            <br />{{ filter_form.get_sql02_direct_assignments }}
+            <br /></p>
+
+        <p><b>SQL query3:</b> Indirect Datasets based on Dataverse permissions
+            <br />{{ filter_form.get_sql03_indirect_datasets }}
+            <br /></p>
+
+        <p><b>SQL query4:</b> Indirect Files
+            <br />{{ filter_form.get_sql04_indirect_files }}
+            <br /></p>
+
+
         {% endif %}
             <hr />
             <input type="reset">
