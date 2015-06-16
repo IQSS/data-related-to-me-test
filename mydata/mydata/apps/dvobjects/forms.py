@@ -152,7 +152,7 @@ WHERE substr(r.assigneeidentifier, 2)= '%s'%s;""" % (username,
 
     def get_sql03_indirect_datasets(self, id_list_str="--- IDs from QUERY 2 ----"):
         if (not self.are_datasets_included()) and (not self.are_files_included()):
-            return ('No query needed. Not looking for datasets or files')
+            return None #('No query needed. Not looking for datasets or files')
 
         sql_str = """SELECT dv.id, dv.dtype, dv.modificationtime, dv.owner_id"""
         sql_str += """ FROM dvobject dv"""

@@ -125,6 +125,9 @@ class PermissionsQueryHelper(object):
         dataverse_ids_as_str = [ str(x) for x in self.all_dataverse_ids]
 
         self.step3_query = self.filter_form.get_sql03_indirect_datasets(','.join(dataverse_ids_as_str))
+        if self.step3_query == None:
+            self.add_err_msg('No query needed for secondary datasets')
+            return
 
         qresults = self.get_query_results(self.step3_query)
         if qresults is None or len(qresults)==0:

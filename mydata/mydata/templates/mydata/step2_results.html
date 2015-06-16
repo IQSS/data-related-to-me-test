@@ -92,7 +92,11 @@
                 <h3 class="panel-title">SQL query 3: Indirect Datasets based on Dataverse permissions</h3>
             </div>
             <div class="panel-body">
-              {{ filter_form.get_sql03_indirect_datasets }}
+                {% if filter_form.get_sql03_indirect_datasets %}
+                    {{ filter_form.get_sql03_indirect_datasets }}
+                {% else %}
+                    No query needed.  Only looking for dataverses.
+                {% endif %}
                              <hr />
 
                 <b>With {{ pqh.all_dataverse_ids|length }} dataverse id{{ pqh.all_dataverse_ids|length|pluralize }}:</b><br />
