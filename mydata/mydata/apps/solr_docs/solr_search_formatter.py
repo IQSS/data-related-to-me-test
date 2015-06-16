@@ -11,7 +11,7 @@ class SolrSearchFormatter:
         self.debug = kwargs.get('debug', 'true')
         self.result_start_offset = kwargs.get('result_start_offset', 0)
         self.num_rows = kwargs.get('num_rows', 20)
-
+        self.fq = kwargs.get('fq', [ 'dvObjectType:(dataverses OR datasets OR files)'])
         self.highlight_start_tag = kwargs.get('highlight_start_tag', '<em>')
         self.highlight_end_tag = kwargs.get('highlight_end_tag', '</em>')
 
@@ -27,7 +27,7 @@ class SolrSearchFormatter:
             #, 'hl.fl' :  ['title','authorName', 'dsDescription', 'publicationCitation', 'authorName_ss']\
             'hl.simple.pre' : self.highlight_start_tag,
             'hl.simple.post' : self.highlight_end_tag,
-            'fq' : [ 'dvObjectType:(dataverses OR datasets OR files)'],
+            'fq' : self.fq, #[ 'dvObjectType:(dataverses OR datasets OR files)'],
             'debug' : self.debug,
             'sort' : ['release_or_create_date_dt desc'],
         }

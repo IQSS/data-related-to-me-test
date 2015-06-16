@@ -4,7 +4,7 @@ from django.conf.urls import patterns, include, url
 urlpatterns = patterns('apps.dvobjects.views',
 
 
-    url(r'^solr/$', 'view_search_results', name='view_search_results'),
+    url(r'^solr/$', 'view_solr_results', name='view_solr_results'),
 
 
     url(r'^db-roles/(?P<username>\w{1,50})$', 'view_default_query', name='view_default_query_with_username'),

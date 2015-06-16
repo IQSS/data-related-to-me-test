@@ -9,11 +9,33 @@
 <hr />
 
 <div class="row">
+    <form method="get" action="{% url 'view_solr_results' %}">
+    <div class="col-md-4">
+            {{ filter_form }}
+    </div>
+    <div class="col-md-6">
+        {% if is_valid_form %}
+        <p><b>solr_query_from_form:</b>
+            <br />{{ filter_form.get_solr_facet_query }}</p>
+        <p><b>sql role query:</b>
+            <br />{{ filter_form.get_sql_role_query_fragment }}</p>
+        {% endif %}
+            <hr />
+            <input type="reset">
+            <input type="submit">
+    </div>
+    </form>
     <div class="col-md-12">
+        <hr /><hr />
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+
      <p> <b>Count:</b> {{ d2me.all_dataverse_ids|length }}
       <br /> <b>Dataverse ids:</b> {{ d2me.all_dataverse_ids }}
         </p>
-     <p>{{ solr_helper.get_dataverse_query_fragment }}</p>
+     <p><b>solr_helper.solr_fq_query:</b> {{ solr_helper.solr_fq_query }}</p>
 
     </div>
     <div class="col-md-12">
