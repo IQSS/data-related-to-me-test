@@ -75,10 +75,16 @@
                 <h3 class="panel-title">SQL query 2: DvObjects from Direct Assignments</h3>
             </div>
             <div class="panel-body">
+                {% if not
                 {{ filter_form.get_sql02_direct_assignments }}
               <hr />
                 <b>With {{ pqh.dvobject_direct_ids|length }} dvobject id{{ pqh.dvobject_direct_ids|length|pluralize }}:</b><br />
-                {{ pqh.step2_query }}
+                {% if pqh.step2_query %}
+                    {{ pqh.step2_query }}
+                {% else %}
+                    No query to run.  No dvobject assignments found.
+                {% endif %}
+
              <hr />
                 <b>Dataverses: </b>{{ pqh.all_dataverse_ids|length }}
                 <br /><b>Datasets: </b>{{ pqh.initial_dataset_ids|length }}

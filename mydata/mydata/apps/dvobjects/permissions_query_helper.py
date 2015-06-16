@@ -79,8 +79,13 @@ class PermissionsQueryHelper(object):
 
 
     def step2_load_direct_dv_objects(self):
-        assert self.dvobject_direct_ids is not None and len(self.dvobject_direct_ids) > 0, 'You must have dv_object_ids'
         assert self.filter_form is not None and self.filter_form.cleaned_data is not None, "filter_form cannot be None (or invalid)"
+
+
+        if self.dvobject_direct_ids is None or len(self.dvobject_direct_ids) ==0:
+            self.add_err_msg('No direct dv objects found')
+            return False
+
 
         dv_ids_as_strings = [ str(x) for x in self.dvobject_direct_ids]
 
@@ -120,14 +125,14 @@ class PermissionsQueryHelper(object):
         """If the user has Dataverse assignments, look for underlying Datasets"""
 
         if self.all_dataverse_ids is None or len(self.all_dataverse_ids) == 0:
-            return
+            return False
 
         dataverse_ids_as_str = [ str(x) for x in self.all_dataverse_ids]
 
         self.step3_query = self.filter_form.get_sql03_indirect_datasets(','.join(dataverse_ids_as_str))
         if self.step3_query == None:
             self.add_err_msg('No query needed for secondary datasets')
-            return
+            return False
 
         qresults = self.get_query_results(self.step3_query)
         if qresults is None or len(qresults)==0:
@@ -137,6 +142,9 @@ class PermissionsQueryHelper(object):
         self.secondary_dataset_ids = [ x['id'] for x in qresults]
         self.all_dataset_ids = set(self.initial_dataset_ids + self.secondary_dataset_ids)
         self.dataset_info.append(qresults)
+
+        return True
+
 
 
     def add_err_msg(self, m):
