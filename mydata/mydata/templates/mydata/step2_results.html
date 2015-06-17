@@ -51,9 +51,22 @@
             </tr>
             <tr>
                 <th>facets</th>
-                <td>{{ solr_results.facets }}</td>
-            </tr>
-        </table>
+                <td>
+
+                        {% for item in solr_results.facets.facet_fields.dvObjectType  %}
+
+                            {% if forloop.counter|divisibleby:2 %}
+                               {{ item }}<br />
+                            {% else %}
+                                <b>{{ item }}:</b>
+                            {% endif %}
+                        {% endfor %}
+
+                       {% comment %} {{ solr_results.facets.facet_fields.dvObjectType }}{% endcomment %}
+                    {{ solr_results.facets }}
+                </td>
+            </tr></table>
+
 
 
         {% include "result_cards.html" %}
