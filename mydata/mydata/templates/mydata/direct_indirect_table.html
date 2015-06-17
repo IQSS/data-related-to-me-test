@@ -1,0 +1,31 @@
+ {% if is_valid_form %}
+ <h4>Direct/Indirect Permissions Table</h4>
+<table class="table table-bordered table-condensed text-center">
+    <thead>
+        <tr class="text-center">
+            <th>&nbsp;</th>
+            <th>Dataverses</th>
+            <th>Datasets</th>
+            <th>DataFiles</th>
+        </tr>
+    </thead>
+    {% for row in filter_form.get_direct_indirect_grid %}
+    <tr>
+        {% if forloop.first %}
+            <td><b>Direct</b><br />(one query)</td>
+        {% else %}
+            <td><b>Indirect*</b><br />(query for each)</td>
+        {% endif %}
+        {% for item in row %}
+            <td>{% if item == True %}
+                <span class="label label-success">Yes</span>
+            {% else %}
+                <span class="label label-default">No</span>
+            {% endif %}
+
+            </td>
+        {% endfor %}
+    </tr>
+    {% endfor %}
+</table>
+{% endif %}

@@ -1,0 +1,11 @@
+ {% for publication_status in doc.publicationStatus %}
+    {% if publication_status == 'Unpublished' %}
+        <span class="label label-warning">Unpublished</span>
+        {% else %}{% if publication_status == 'Draft' %}
+                <span class="label label-primary">Draft</span>
+            {% else %}{% if publication_status == 'Published' %}
+                    <span class="label label-success">Published</span>
+                {% else %}
+                    <span class="label label-primary">Unknown status: {{ publication_status }}</span>
+    {% endif %}{% endif %}{% endif %}
+{% endfor %}

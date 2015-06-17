@@ -23,251 +23,51 @@
 
         </form>
     </div>
+    {% if is_valid_form %}
     <div class="col-md-7">
-
-        {% if is_valid_form %}
-            <a href="#solr_query_fragment" class="btn-xs btn-primary">solr query</a>
+        <a href="#sql_query_steps" class="btn-xs btn-primary">sql (postgres) queries</a>
+        <a href="#solr_query_fragment" class="btn-xs btn-primary">solr query</a>
         <hr />
+        {% include "direct_indirect_table.html" %}
 
-            <table class="table table-bordered table-condensed text-center">
-            <thead>
-                <tr class="text-center">
-                    <th>&nbsp;</th>
-                    <th>Dataverses</th>
-                    <th>Datasets</th>
-                    <th>DataFiles</th>
-                </tr>
-            </thead>
-            {% for row in filter_form.get_direct_indirect_grid %}
-            <tr>
-                {% if forloop.first %}
-                    <td><b>Direct</b><br />(one query)</td>
-                {% else %}
-                    <td><b>Indirect*</b><br />(query for each)</td>
-                {% endif %}
-                {% for item in row %}
-                    <td>{% if item == True %}
-                        <span class="label label-success">Yes</span>
-                    {% else %}
-                        <span class="label label-default">No</span>
-                    {% endif %}
+        <p><b>Result{{ solr_results.hits|pluralize }}:</b> {{ solr_results.hits }}{% if solr_results.hits > 0 %},
+        showing {{ solr_results.docs|length }} card{{ solr_results.docs|length|pluralize }}
+        {% endif %}</p>
+        <p>facets: {{ solr_results.facets }}</p>
 
-                    </td>
-                {% endfor %}
-            </tr>
-            {% endfor %}
-
-        </table>
-
-
-        <p><b>solr_query_from_form:</b>
-            <br />{{ filter_form.get_solr_facet_query }}</p>
-
-        <!-- Step 1 -->
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title">SQL query 1: Direct Assignments</h3>
-            </div>
-            <div class="panel-body">
-
-                {{ pqh.step1_query }}
-                {#{ filter_form.get_sql_01_role_assignment_query }#}
-          </div>
-            <div class="panel-footer">
-                <b>Result:</b>
-                {{ pqh.dvobject_direct_ids|length }} dvobject id{{ pqh.dvobject_direct_ids|length|pluralize }} found
-            </div>
-        </div>
-        <!-- Step 2 -->
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title">SQL query 2: DvObjects from Direct Assignments</h3>
-            </div>
-            <div class="panel-body">
-                {% if not
-                {{ filter_form.get_sql02_direct_assignments }}
-              <hr />
-                <b>With {{ pqh.dvobject_direct_ids|length }} dvobject id{{ pqh.dvobject_direct_ids|length|pluralize }}:</b><br />
-                {% if pqh.step2_query %}
-                    {{ pqh.step2_query }}
-                {% else %}
-                    No query to run.  No dvobject assignments found.
-                {% endif %}
-            </div>
-            <div class="panel-footer">
-
-         <b>Results:</b>
-                <div style="padding-left:60px;">
-                 <table class="table table-bordered table-condensed">
-                    <tr>
-                        <th>Dataverses</th>
-                        <td>{{ pqh.all_dataverse_ids|length }}</td>
-                    </tr>
-                    <tr>
-                        <th>Datasets</th>
-                        <td>{{ pqh.initial_dataset_ids|length }}</td>
-                    </tr>
-                    <tr>
-                        <th>Files</th>
-                        <td>{{ pqh.initial_file_ids|length }}</td>
-                    </tr>
-                </table>
-              </div>
-          </div>
-        </div>
-        <!-- STEP 3 -->
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title">SQL query 3: Indirect Datasets based on Dataverse permissions</h3>
-            </div>
-            <div class="panel-body">
-                {% if filter_form.get_sql03_indirect_datasets %}
-                    {{ filter_form.get_sql03_indirect_datasets }}
-                {% else %}
-                    No query needed.  Only looking for dataverses.
-                {% endif %}
-                             <hr />
-
-                <b>With {{ pqh.all_dataverse_ids|length }} dataverse id{{ pqh.all_dataverse_ids|length|pluralize }}:</b><br />
-
-                                {{ pqh.step3_query }}
-          </div>
-           <div class="panel-footer">
-                <b>Result:</b>
-               <div style="padding-left:60px;">
-                <table class="table table-bordered table-condensed">
-                    <tr>
-                        <th>Direct (Initial) Datasets<br />
-                            <span style="font-weight: normal;">(from step 2)</span></th>
-                        <td>{{ pqh.initial_dataset_ids|length }}</td>
-                    </tr>
-                    <tr>
-                        <th>Indirect (Secondary) Datasets</th>
-                        <td>{{ pqh.secondary_dataset_ids|length }}</td>
-                    </tr>
-                    <tr>
-                        <th>*All Datasets</th>
-                        <td>{{ pqh.all_dataset_ids|length }}</td>
-                    </tr>
-                </table>
-                *Note: The ids for the directly and indirectly assigned datasets may overlap--even 100% overlap.
-                </div>
-            </div>
-        </div>
-        <!-- STEP 4 -->
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title">SQL query 4: Indirect Files based on Dataverse and Dataset permissions</h3>
-            </div>
-            <div class="panel-body">
-                {% if filter_form.get_sql04_indirect_files %}
-                    {{ filter_form.get_sql04_indirect_files }}
-                {% else %}
-                    No query needed.
-                {% endif %}
-                 <hr />
-
-                <b>With {{ pqh.all_dataset_ids|length }} dataset id{{ pqh.all_dataset_ids|length|pluralize }}:</b><br />
-                       {{ pqh.step4_query }}
-          </div><div class="panel-footer">
-                <b>Result:</b>
-               <div style="padding-left:60px;">
-                <table class="table table-bordered table-condensed">
-                    <tr>
-                        <th>Direct (Initial) Files<br />
-                            <span style="font-weight: normal;">(from step 2)</span></th>
-                        <td>{{ pqh.initial_file_ids|length }}</td>
-                    </tr>
-                    <tr>
-                        <th>Indirect (Secondary) Files</th>
-                        <td>{{ pqh.secondary_file_ids|length }}</td>
-                    </tr>
-                    <tr>
-                        <th>*All Files</th>
-                        <td>{{ pqh.all_file_ids|length }}</td>
-                    </tr>
-                </table>
-                *Note: The ids for the directly and indirectly assigned files may overlap--even 100% overlap.
-                </div>
-            </div>
-        </div>
-
-        {% endif %}
-
+        {% include "result_cards.html" %}
     </div>
+    {% endif %}
 </div>
 <div class="row">
     <div class="col-md-12">
-        <p>num results: {{ solr_results.hits }}</p>
-        <p>facets: {{ solr_results.facets }}</p>
 
-        {% for doc in solr_results.docs %}
-            {% if doc.dvObjectType == 'dataverses' %}
-                <div class="panel panel-default">
-                  <div class="panel-heading">{{ doc.name }} (dataverse)</div>
-                  <div class="panel-body">
-                       {% for publication_status in doc.publicationStatus %}
-                        {% include "publication_status.html" %}
-                      {% endfor %}
-                      <hr />
-                      <p><b>dateFriendly:</b> {{ doc.dateFriendly }} - {{ doc.parentName }}</p>
-                      <p><b>identifier:</b> {{ doc.identifier }}</p>
+        <!-- POSTGRES QUERIES -->
+        <a href="#top" class="btn-xs btn-primary">top</a>
+        {% include "sql_query_steps.html" %}
+        <a href="#top" class="btn-xs btn-primary">top</a>
 
-                        {{ doc.description }}
-                    <hr />{{ doc }}
-                  </div>
-                </div>
-            {% endif %}
+        <!-- SOLR QUERY -->
+        <a name="solr_query_fragment"></a>
 
-            {% if doc.dvObjectType == 'datasets' %}
-                <div class="panel panel-default">
-                  <div class="panel-heading">{{ doc.title }} (dataset)</div>
-                  <div class="panel-body">
-                      {% for publication_status in doc.publicationStatus %}
-                        {% include "publication_status.html" %}
-                      {% endfor %}
-                      <hr />
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">SOLR QUERY</h3>
+            </div>
+            <div class="panel-body">
 
-                       <p><b>dateFriendly:</b> {{ doc.dateFriendly }} - {{ doc.parentName }}</p>
-                       <p><b>description:</b> {{ doc.dsDescriptionValue.0 }}</p>
-                       <p><b>persistent id:</b> {{ doc.dsPersistentId }}</p>
-                       <p><b>persistentUrl:</b> <a href="{{ doc.persistentUrl }}">{{ doc.persistentUrl }}</a></p>
-                       <p><b>publicationCitation:</b> {{ doc.publicationCitation.0 }}</p>
+                <b>solr_query_from_form (no ids):</b>
+                <div class="well">{{ filter_form.get_solr_facet_query }}</div>
 
-                    {#{ doc }#}
+                <b>full solr_query:</b>
+                <div class="well">{{ pqh.get_solr_fq_query }}</div>
+          </div>
+        </div>
 
-                  </div>
-                </div>
-            {% endif %}
+        <a href="#top" class="btn-xs btn-primary">top</a>
 
-            {% if doc.dvObjectType == 'files' %}
-                <div class="panel panel-default">
-                  <div class="panel-heading">{{ doc.name }} (file)</div>
-                  <div class="panel-body">
-                      {#{ doc }}<hr />#}
-                      {% for publication_status in doc.publicationStatus %}
-                        {% include "publication_status.html" %}
-                      {% endfor %}
-                      <hr />
-                       <p><b>dataset:</b> {{ doc.parentName }}</p>
-                       <p><b>persistentUrl:</b> <a href="{{ doc.persistentUrl }}">{{ doc.persistentUrl }}</a></p>
-                       <p><b>dateFriendly:</b> {{ doc.dateFriendly }} </p>
-                       <p><b>fileContentType:</b> {{ doc.fileContentType }}</p>
-                       <p><b>fileType:</b> {{ doc.fileType }}</p>
-                       <p><b>entityId:</b> {{ doc.entityId }}</p>
-                     <p><b>fileMd5:</b> {{ doc.fileMd5 }}</p>
-                       <p><b>fileSizeInBytes:</b> {{ doc.fileSizeInBytes|intcomma }}</p>
-                    {#{ doc }#}
-
-                  </div>
-                </div>
-            {% endif %}
-
-        {% endfor %}
     </div>
 </div>
-<a href="#top" class="btn-xs btn-primary">top</a>
-<a name="solr_query_fragment"></a>
-<div class="well">{{ pqh.get_solr_fq_query }}</div>
-<a href="#top" class="btn-xs btn-primary">top</a>
+
+
 {% endblock %}

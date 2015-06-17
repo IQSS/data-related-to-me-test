@@ -1,0 +1,146 @@
+{% if is_valid_form %}
+<hr />
+<div class="row">
+    <div class="col-md-7">
+
+
+<a name="sql_query_steps"></a>
+
+
+<!-- Step 1 --><a href="#top" class="btn-xs btn-primary">top</a>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">SQL query 1: Direct Assignments</h3>
+    </div>
+    <div class="panel-body">
+
+        {{ pqh.step1_query }}
+        {#{ filter_form.get_sql_01_role_assignment_query }#}
+  </div>
+    <div class="panel-footer">
+        <b>Result:</b>
+        {{ pqh.dvobject_direct_ids|length }} dvobject id{{ pqh.dvobject_direct_ids|length|pluralize }} found
+    </div>
+</div>
+<!-- Step 2 --><a href="#top" class="btn-xs btn-primary">top</a>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">SQL query 2: DvObjects from Direct Assignments</h3>
+    </div>
+    <div class="panel-body">
+        {% if not
+        {{ filter_form.get_sql02_direct_assignments }}
+      <hr />
+        <b>With {{ pqh.dvobject_direct_ids|length }} dvobject id{{ pqh.dvobject_direct_ids|length|pluralize }}:</b><br />
+        {% if pqh.step2_query %}
+            {{ pqh.step2_query }}
+        {% else %}
+            No query to run.  No dvobject assignments found.
+        {% endif %}
+    </div>
+    <div class="panel-footer">
+
+ <b>Results:</b>
+        <div style="padding-left:60px;">
+         <table class="table table-bordered table-condensed">
+            <tr>
+                <th>Dataverses</th>
+                <td>{{ pqh.all_dataverse_ids|length }}</td>
+            </tr>
+            <tr>
+                <th>Datasets</th>
+                <td>{{ pqh.initial_dataset_ids|length }}</td>
+            </tr>
+            <tr>
+                <th>Files</th>
+                <td>{{ pqh.initial_file_ids|length }}</td>
+            </tr>
+        </table>
+      </div>
+  </div>
+</div>
+<!-- STEP 3 --><a href="#top" class="btn-xs btn-primary">top</a>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">SQL query 3: Indirect Datasets based on Dataverse permissions</h3>
+    </div>
+    <div class="panel-body">
+        {% if filter_form.get_sql03_indirect_datasets %}
+            {{ filter_form.get_sql03_indirect_datasets }}
+        {% else %}
+            No query needed.  Only looking for dataverses.
+        {% endif %}
+                     <hr />
+
+        <b>With {{ pqh.all_dataverse_ids|length }} dataverse id{{ pqh.all_dataverse_ids|length|pluralize }}:</b><br />
+
+                        {{ pqh.step3_query }}
+  </div>
+   <div class="panel-footer">
+        <b>Result:</b>
+       <div style="padding-left:60px;">
+        <table class="table table-bordered table-condensed">
+            <tr>
+                <th>Direct (Initial) Datasets<br />
+                    <span style="font-weight: normal;">(from step 2)</span></th>
+                <td>{{ pqh.initial_dataset_ids|length }}</td>
+            </tr>
+            <tr>
+                <th>Indirect (Secondary) Datasets</th>
+                <td>{{ pqh.secondary_dataset_ids|length }}</td>
+            </tr>
+            <tr>
+                <th>*All Datasets</th>
+                <td>{{ pqh.all_dataset_ids|length }}</td>
+            </tr>
+        </table>
+        *Note: The ids for the directly and indirectly assigned datasets may overlap--even 100% overlap.
+        </div>
+    </div>
+</div>
+<!-- STEP 4 --><a href="#top" class="btn-xs btn-primary">top</a>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">SQL query 4: Indirect Files based on Dataverse and Dataset permissions</h3>
+    </div>
+    <div class="panel-body">
+        {% if filter_form.get_sql04_indirect_files %}
+            {{ filter_form.get_sql04_indirect_files }}
+        {% else %}
+            No query needed.
+        {% endif %}
+         <hr />
+
+        <b>With {{ pqh.all_dataset_ids|length }} dataset id{{ pqh.all_dataset_ids|length|pluralize }}:</b><br />
+               {{ pqh.step4_query }}
+    </div>
+    <div class="panel-footer">
+        <b>Result:</b>
+       <div style="padding-left:60px;">
+        <table class="table table-bordered table-condensed">
+            <tr>
+                <th>Direct (Initial) Files<br />
+                    <span style="font-weight: normal;">(from step 2)</span></th>
+                <td>{{ pqh.initial_file_ids|length }}</td>
+            </tr>
+            <tr>
+                <th>Indirect (Secondary) Files</th>
+                <td>{{ pqh.secondary_file_ids|length }}</td>
+            </tr>
+            <tr>
+                <th>*All Files</th>
+                <td>{{ pqh.all_file_ids|length }}</td>
+            </tr>
+        </table>
+        *Note: The ids for the directly and indirectly assigned files may overlap--even 100% overlap.
+        </div>
+    </div>
+</div>
+   </div><!-- end: column-->
+
+</div><!-- end: row -->
+{% endif %}
