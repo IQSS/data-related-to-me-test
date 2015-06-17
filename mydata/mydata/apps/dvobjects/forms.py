@@ -15,6 +15,9 @@ class MyDataFilterForm(forms.Form):
     # ------------------------------------------------------
     # DvObjects
     # ------------------------------------------------------
+    SOLR_DVOBJECT_TYPE = 'dvObjectType'
+    SOLR_PUBLICATION_STATUS = 'publicationStatus'
+
     SOLR_DATAVERSES_LABEL = "dataverses"
     SOLR_DATASETS_LABEL = "datasets"
     SOLR_FILES_LABEL = "files"
@@ -62,19 +65,21 @@ class MyDataFilterForm(forms.Form):
         assert self.cleaned_data is not None, "Only use this for valid forms!"
         return self.SOLR_DATAVERSES_LABEL in self.cleaned_data['dvobject_types']
 
-    def get_solr_facet_query(self):
+    def get_solr_facet_query(self, entity_query_clause=None):
         assert self.cleaned_data is not None, "Only use this for valid forms!"
 
         query_parts = []
 
-        query_parts.append(self.get_solr_query_clause_for_param('dvobject_types'))
-        query_parts.append(self.get_solr_query_clause_for_param('publication_statuses'))
+        query_parts.append(self.get_solr_query_clause_for_param('dvobject_types', self.SOLR_DVOBJECT_TYPE ))
+        query_parts.append(self.get_solr_query_clause_for_param('publication_statuses', self.SOLR_PUBLICATION_STATUS))
+        if entity_query_clause:
+            query_parts.append(entity_query_clause)
 
         return ' AND '.join(query_parts)
 
     #(publicationStatus:Unpublished)
 
-    def get_solr_query_clause_for_param(self, param_name):
+    def get_solr_query_clause_for_param(self, param_name, solr_param_name):
         """
         Example of formatted solr query clause:         (dvObjectType:(dataverses OR datasets))
         """
@@ -87,7 +92,7 @@ class MyDataFilterForm(forms.Form):
         if len(value_list) > 1:
             value_str = '(%s)' % value_str
 
-        return  """(%s:%s)""" % (param_name, value_str)
+        return  """(%s:%s)""" % (solr_param_name, value_str)
 
 
     def get_sql_role_query_fragment(self):
@@ -161,9 +166,10 @@ WHERE substr(r.assigneeidentifier, 2)= '%s'%s;""" % (username,
 
         return sql_str
 
+
     def get_sql04_indirect_files(self, id_list_str="--- Dataset IDs from Queries 2 and 3 ---"):
         if not self.are_files_included():
-            return 'No query needed. Not looking for files'
+            return None  #'No query needed. Not looking for files'
 
         sql_str = """SELECT dv.id, dv.dtype, dv.modificationtime, dv.owner_id"""
         sql_str += """ FROM dvobject dv"""

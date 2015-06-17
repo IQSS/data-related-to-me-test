@@ -10,7 +10,7 @@
 <hr />
 
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-5">
     <form method="get" action="{% url 'view_solr_results' %}">
         <table class="table table-condensed">
 
@@ -23,8 +23,12 @@
 
         </form>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-7">
+
         {% if is_valid_form %}
+            <a href="#solr_query_fragment" class="btn-xs btn-primary">solr query</a>
+        <hr />
+
             <table class="table table-bordered table-condensed text-center">
             <thead>
                 <tr class="text-center">
@@ -127,9 +131,6 @@
                 <b>With {{ pqh.all_dataverse_ids|length }} dataverse id{{ pqh.all_dataverse_ids|length|pluralize }}:</b><br />
 
                                 {{ pqh.step3_query }}
-
-
-
           </div>
            <div class="panel-footer">
                 <b>Result:</b>
@@ -153,14 +154,42 @@
                 </div>
             </div>
         </div>
-
+        <!-- STEP 4 -->
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h3 class="panel-title">SQL query 4: Indirect Files based on Dataverse and Dataset permissions</h3>
             </div>
             <div class="panel-body">
-              {{ filter_form.get_sql04_indirect_files }}
-          </div>
+                {% if filter_form.get_sql04_indirect_files %}
+                    {{ filter_form.get_sql04_indirect_files }}
+                {% else %}
+                    No query needed.
+                {% endif %}
+                 <hr />
+
+                <b>With {{ pqh.all_dataset_ids|length }} dataset id{{ pqh.all_dataset_ids|length|pluralize }}:</b><br />
+                       {{ pqh.step4_query }}
+          </div><div class="panel-footer">
+                <b>Result:</b>
+               <div style="padding-left:60px;">
+                <table class="table table-bordered table-condensed">
+                    <tr>
+                        <th>Direct (Initial) Files<br />
+                            <span style="font-weight: normal;">(from step 2)</span></th>
+                        <td>{{ pqh.initial_file_ids|length }}</td>
+                    </tr>
+                    <tr>
+                        <th>Indirect (Secondary) Files</th>
+                        <td>{{ pqh.secondary_file_ids|length }}</td>
+                    </tr>
+                    <tr>
+                        <th>*All Files</th>
+                        <td>{{ pqh.all_file_ids|length }}</td>
+                    </tr>
+                </table>
+                *Note: The ids for the directly and indirectly assigned files may overlap--even 100% overlap.
+                </div>
+            </div>
         </div>
 
         {% endif %}
@@ -168,14 +197,6 @@
     </div>
 </div>
 <div class="row">
-    <div class="col-md-12">
-
-     <p> <b>Count:</b> {{ d2me.all_dataverse_ids|length }}
-      <br /> <b>Dataverse ids:</b> {{ d2me.all_dataverse_ids }}
-        </p>
-     <p><b>solr_helper.solr_fq_query:</b> {{ solr_helper.solr_fq_query }}</p>
-
-    </div>
     <div class="col-md-12">
         <p>num results: {{ solr_results.hits }}</p>
         <p>facets: {{ solr_results.facets }}</p>
@@ -219,7 +240,34 @@
                 </div>
             {% endif %}
 
+            {% if doc.dvObjectType == 'files' %}
+                <div class="panel panel-default">
+                  <div class="panel-heading">{{ doc.name }} (file)</div>
+                  <div class="panel-body">
+                      {#{ doc }}<hr />#}
+                      {% for publication_status in doc.publicationStatus %}
+                        {% include "publication_status.html" %}
+                      {% endfor %}
+                      <hr />
+                       <p><b>dataset:</b> {{ doc.parentName }}</p>
+                       <p><b>persistentUrl:</b> <a href="{{ doc.persistentUrl }}">{{ doc.persistentUrl }}</a></p>
+                       <p><b>dateFriendly:</b> {{ doc.dateFriendly }} </p>
+                       <p><b>fileContentType:</b> {{ doc.fileContentType }}</p>
+                       <p><b>fileType:</b> {{ doc.fileType }}</p>
+                       <p><b>entityId:</b> {{ doc.entityId }}</p>
+                     <p><b>fileMd5:</b> {{ doc.fileMd5 }}</p>
+                       <p><b>fileSizeInBytes:</b> {{ doc.fileSizeInBytes|intcomma }}</p>
+                    {#{ doc }#}
+
+                  </div>
+                </div>
+            {% endif %}
+
         {% endfor %}
     </div>
 </div>
+<a href="#top" class="btn-xs btn-primary">top</a>
+<a name="solr_query_fragment"></a>
+<div class="well">{{ pqh.get_solr_fq_query }}</div>
+<a href="#top" class="btn-xs btn-primary">top</a>
 {% endblock %}

@@ -52,6 +52,19 @@ class SolrHelper(object):
         return self.make_solr_query(qstr, formatted_results=False)
 
 
+
+    def make_dataverse_query2(self, solr_fq_query):
+
+        #solr_fq_query = 'dvobject_types:(dataverses OR datasets OR files)'
+
+        search_term = '*'
+
+        solr = pysolr.Solr(settings.SOLR_URL, timeout=10)
+
+        solr_results = solr.search(search_term, fq=solr_fq_query, rows=10)
+
+        return solr_results
+
     def make_dataverse_query(self):
 
         self.solr_fq_query = self.get_dataverse_facet_query()

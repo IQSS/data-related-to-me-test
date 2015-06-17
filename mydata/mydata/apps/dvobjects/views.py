@@ -38,22 +38,19 @@ def view_solr_results(request, username=None):
             pqh = PermissionsQueryHelper(username, filter_form)
             pqh.run_queries()
 
-            d.update(dict(pqh=pqh))
+            solr_helper = SolrHelper()
+            solr_results = solr_helper.make_dataverse_query2(pqh.get_solr_fq_query())
+
+            d.update({ 'pqh' : pqh,
+                       'solr_results' : solr_results
+                       })
 
             msgt('filter_form: %s' % filter_form.cleaned_data)
 
     else:
         filter_form = MyDataFilterForm()
 
-    d2me = DataRelatedToMe(username=username)
-
-    solr_helper = SolrHelper(d2me)
-    solr_results = solr_helper.make_dataverse_query()
-
-    d.update(dict(d2me=d2me,
-             solr_helper=solr_helper,
-             solr_results=solr_results,
-             filter_form=filter_form,
+    d.update(dict(filter_form=filter_form,
              is_valid_form=is_valid_form))
 
     return render_to_response('mydata/step2_results.html', d)
