@@ -38,10 +38,13 @@ def view_solr_results(request, username=None):
             pqh = PermissionsQueryHelper(username, filter_form)
             pqh.run_queries()
 
+            search_term = filter_form.get_search_term()
+
             solr_helper = SolrHelper()
-            solr_results = solr_helper.make_dataverse_query2(pqh.get_solr_fq_query())
+            solr_results = solr_helper.make_dataverse_query2(search_term, pqh.get_solr_fq_query())
 
             d.update({ 'pqh' : pqh,
+                        'search_term' : search_term,
                        'solr_results' : solr_results
                        })
 

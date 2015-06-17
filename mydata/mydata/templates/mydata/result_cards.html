@@ -9,9 +9,10 @@
               <hr />
               <p><b>dateFriendly:</b> {{ doc.dateFriendly }} - {{ doc.parentName }}</p>
               <p><b>identifier:</b> {{ doc.identifier }}</p>
+              <p><b>description:</b> {{ doc.description }}</p>
+              <p><b>entityId:</b> {{ doc.entityId }}</p>
 
-                {{ doc.description }}
-            <hr />{{ doc }}
+            <div class="well">{{ doc }}</div>
           </div>
         </div>
     {% endif %}
@@ -29,8 +30,9 @@
                <p><b>persistent id:</b> {{ doc.dsPersistentId }}</p>
                <p><b>persistentUrl:</b> <a href="{{ doc.persistentUrl }}">{{ doc.persistentUrl }}</a></p>
                <p><b>publicationCitation:</b> {{ doc.publicationCitation.0 }}</p>
+               <p><b>entityId:</b> {{ doc.entityId }}</p>
 
-            {#{ doc }#}
+            <div class="well">{{ doc }}</div>
 
           </div>
         </div>
@@ -52,7 +54,7 @@
                <p><b>entityId:</b> {{ doc.entityId }}</p>
              <p><b>fileMd5:</b> {{ doc.fileMd5 }}</p>
                <p><b>fileSizeInBytes:</b> {{ doc.fileSizeInBytes|intcomma }}</p>
-            {#{ doc }#}
+            <div class="well">{{ doc }}</div>
 
           </div>
         </div>

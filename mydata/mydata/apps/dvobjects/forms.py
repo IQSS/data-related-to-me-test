@@ -53,6 +53,14 @@ class MyDataFilterForm(forms.Form):
                                      choices=ROLE_CHOICES,
                                       initial=[x[0] for x in ROLE_CHOICES])
 
+    def get_search_term(self):
+        assert self.cleaned_data is not None, "Only use this for valid forms!"
+        st = self.cleaned_data['search_term']
+        if st is None or st.strip() == '':
+            return '*'
+
+        return st
+
     def are_files_included(self):
         assert self.cleaned_data is not None, "Only use this for valid forms!"
         return self.SOLR_FILES_LABEL in self.cleaned_data['dvobject_types']

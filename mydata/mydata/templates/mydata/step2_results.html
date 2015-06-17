@@ -29,7 +29,7 @@
         <a href="#solr_query_fragment" class="btn-xs btn-primary">solr query</a>
         <hr />
         {% include "direct_indirect_table.html" %}
-
+        <p><b>Search term:</b> {{ search_term }}</p>
         <p><b>Result{{ solr_results.hits|pluralize }}:</b> {{ solr_results.hits }}{% if solr_results.hits > 0 %},
         showing {{ solr_results.docs|length }} card{{ solr_results.docs|length|pluralize }}
         {% endif %}</p>
@@ -56,10 +56,10 @@
             </div>
             <div class="panel-body">
 
-                <b>solr_query_from_form (no ids):</b>
+                <b>Partial Solr FQ query (no ids):</b>
                 <div class="well">{{ filter_form.get_solr_facet_query }}</div>
 
-                <b>full solr_query:</b>
+                <b>Full Solr FQ query:</b>
                 <div class="well">{{ pqh.get_solr_fq_query }}</div>
           </div>
         </div>

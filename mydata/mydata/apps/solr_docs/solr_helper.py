@@ -53,15 +53,15 @@ class SolrHelper(object):
 
 
 
-    def make_dataverse_query2(self, solr_fq_query):
+    def make_dataverse_query2(self, search_term, solr_fq_query):
 
         #solr_fq_query = 'dvobject_types:(dataverses OR datasets OR files)'
 
-        search_term = '*'
-
         solr = pysolr.Solr(settings.SOLR_URL, timeout=10)
 
-        solr_results = solr.search(search_term, fq=solr_fq_query, rows=10)
+        searchFormatter = SolrSearchFormatter(**dict(fq=solr_fq_query))
+
+        solr_results = solr.search(search_term, **searchFormatter.get_solr_kwargs())
 
         return solr_results
 
