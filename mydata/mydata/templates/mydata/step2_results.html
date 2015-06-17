@@ -33,12 +33,28 @@
         <a href="#solr_query_fragment" class="btn-xs btn-primary">solr query</a>
         <hr />
         {% include "direct_indirect_table.html" %}
-        <p><b>Search term:</b> {{ search_term }}  </p>
-        <p><b>Solr Time:</b> {{ solr_results.qtime}}ms (doesn't include postgres queries)</p>
-        <p><b>Result{{ solr_results.hits|pluralize }}:</b> {{ solr_results.hits }}{% if solr_results.hits > 0 %},
+
+        <table class="table table-bordered table-condensed">
+            <tr>
+                <th>Search&nbsp;term</th>
+                <td>{{ search_term }}</td>
+            </tr>
+            <tr>
+                <th>Solr Time</th>
+                <td>{{ solr_results.qtime}}ms (doesn't include postgres queries)</td>
+            </tr>
+            <tr>
+                <th>Result{{ solr_results.hits|pluralize }}</th>
+                <td>{{ solr_results.hits }} card{{ solr_results.hits|length|pluralize }}{% if solr_results.hits > 0 %},
         showing {{ solr_results.docs|length }} card{{ solr_results.docs|length|pluralize }}
-        {% endif %}</p>
-        <p>facets: {{ solr_results.facets }}</p>
+        {% endif %}</td>
+            </tr>
+            <tr>
+                <th>facets</th>
+                <td>{{ solr_results.facets }}</td>
+            </tr>
+        </table>
+
 
         {% include "result_cards.html" %}
     {% endif %}
