@@ -23,8 +23,12 @@
 
         </form>
     </div>
-    {% if is_valid_form %}
     <div class="col-md-7">
+        {% if ERR_FOUND %}
+            <div class="alert alert-info" role="alert">{{ ERR_MSG }}</div>
+        {% endif %}
+    {% if is_valid_form and not ERR_FOUND %}
+
         <a href="#sql_query_steps" class="btn-xs btn-primary">sql (postgres) queries</a>
         <a href="#solr_query_fragment" class="btn-xs btn-primary">solr query</a>
         <hr />
@@ -36,8 +40,8 @@
         <p>facets: {{ solr_results.facets }}</p>
 
         {% include "result_cards.html" %}
-    </div>
     {% endif %}
+    </div>
 </div>
 <div class="row">
     <div class="col-md-12">
@@ -47,6 +51,7 @@
         {% include "sql_query_steps.html" %}
         <a href="#top" class="btn-xs btn-primary">top</a>
 
+        {% if is_valid_form %}
         <!-- SOLR QUERY -->
         <a name="solr_query_fragment"></a>
 
@@ -65,6 +70,7 @@
         </div>
 
         <a href="#top" class="btn-xs btn-primary">top</a>
+        {% endif %}
 
     </div>
 </div>

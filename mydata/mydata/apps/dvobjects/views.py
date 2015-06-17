@@ -37,18 +37,22 @@ def view_solr_results(request, username=None):
 
             pqh = PermissionsQueryHelper(username, filter_form)
             pqh.run_queries()
+            if pqh.err_found:
+                d.update({ 'ERR_FOUND' : True,
+                           'ERR_MSG' : pqh.err_msg })
 
-            search_term = filter_form.get_search_term()
+            else:
+                search_term = filter_form.get_search_term()
 
-            solr_helper = SolrHelper()
-            solr_results = solr_helper.make_dataverse_query2(search_term, pqh.get_solr_fq_query())
+                solr_helper = SolrHelper()
+                solr_results = solr_helper.make_dataverse_query2(search_term, pqh.get_solr_fq_query())
 
-            d.update({ 'pqh' : pqh,
-                        'search_term' : search_term,
-                       'solr_results' : solr_results
-                       })
+                d.update({ 'pqh' : pqh,
+                            'search_term' : search_term,
+                           'solr_results' : solr_results
+                           })
 
-            msgt('filter_form: %s' % filter_form.cleaned_data)
+                msgt('filter_form: %s' % filter_form.cleaned_data)
 
     else:
         filter_form = MyDataFilterForm()

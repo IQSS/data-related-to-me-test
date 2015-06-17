@@ -17,6 +17,12 @@ class PermissionsQueryHelper(object):
         self.step4_query = None
 
         # -----------------------
+        # error messages
+        # -----------------------
+        self.err_found = False
+        self.err_msg = None
+
+        # -----------------------
         # dataverses
         # -----------------------
         self.dataverse_info = []
