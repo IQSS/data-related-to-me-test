@@ -46,13 +46,14 @@ def view_solr_results(request, username=None):
 
                 solr_helper = SolrHelper()
                 solr_results = solr_helper.make_dataverse_query2(search_term, pqh.get_solr_fq_query())
-
+                msgt(dir(solr_results))
+                msgt(solr_results.stats)
                 d.update({ 'pqh' : pqh,
                             'search_term' : search_term,
                            'solr_results' : solr_results
                            })
 
-                msgt('filter_form: %s' % filter_form.cleaned_data)
+                #msgt('filter_form: %s' % filter_form.cleaned_data)
 
     else:
         filter_form = MyDataFilterForm()
