@@ -59,7 +59,7 @@
         <p><b>solr_query_from_form:</b>
             <br />{{ filter_form.get_solr_facet_query }}</p>
 
-
+        <!-- Step 1 -->
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h3 class="panel-title">SQL query 1: Direct Assignments</h3>
@@ -69,7 +69,12 @@
                 {{ pqh.step1_query }}
                 {#{ filter_form.get_sql_01_role_assignment_query }#}
           </div>
+            <div class="panel-footer">
+                <b>Result:</b>
+                {{ pqh.dvobject_direct_ids|length }} dvobject id{{ pqh.dvobject_direct_ids|length|pluralize }} found
+            </div>
         </div>
+        <!-- Step 2 -->
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h3 class="panel-title">SQL query 2: DvObjects from Direct Assignments</h3>
@@ -84,15 +89,29 @@
                 {% else %}
                     No query to run.  No dvobject assignments found.
                 {% endif %}
+            </div>
+            <div class="panel-footer">
 
-             <hr />
-                <b>Dataverses: </b>{{ pqh.all_dataverse_ids|length }}
-                <br /><b>Datasets: </b>{{ pqh.initial_dataset_ids|length }}
-                <br /><b>Files: </b>{{ pqh.initial_file_ids|length }}
-
+         <b>Results:</b>
+                <div style="padding-left:60px;">
+                 <table class="table table-bordered table-condensed">
+                    <tr>
+                        <th>Dataverses</th>
+                        <td>{{ pqh.all_dataverse_ids|length }}</td>
+                    </tr>
+                    <tr>
+                        <th>Datasets</th>
+                        <td>{{ pqh.initial_dataset_ids|length }}</td>
+                    </tr>
+                    <tr>
+                        <th>Files</th>
+                        <td>{{ pqh.initial_file_ids|length }}</td>
+                    </tr>
+                </table>
+              </div>
           </div>
         </div>
-
+        <!-- STEP 3 -->
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h3 class="panel-title">SQL query 3: Indirect Datasets based on Dataverse permissions</h3>
@@ -109,12 +128,30 @@
 
                                 {{ pqh.step3_query }}
 
-              <hr />
-                <b>Dataverses: </b>{{ pqh.all_dataverse_ids|length }}
-                <br /><b>Datasets: </b> {{ pqh.all_dataset_ids|length }}  (initial: {{ pqh.initial_dataset_ids|length }})
-                <br /><b>Files: </b>{{ pqh.initial_file_ids|length }}
+
 
           </div>
+           <div class="panel-footer">
+                <b>Result:</b>
+               <div style="padding-left:60px;">
+                <table class="table table-bordered table-condensed">
+                    <tr>
+                        <th>Direct (Initial) Datasets<br />
+                            <span style="font-weight: normal;">(from step 2)</span></th>
+                        <td>{{ pqh.initial_dataset_ids|length }}</td>
+                    </tr>
+                    <tr>
+                        <th>Indirect (Secondary) Datasets</th>
+                        <td>{{ pqh.secondary_dataset_ids|length }}</td>
+                    </tr>
+                    <tr>
+                        <th>*All Datasets</th>
+                        <td>{{ pqh.all_dataset_ids|length }}</td>
+                    </tr>
+                </table>
+                *Note: The ids for the directly and indirectly assigned datasets may overlap--even 100% overlap.
+                </div>
+            </div>
         </div>
 
         <div class="panel panel-default">

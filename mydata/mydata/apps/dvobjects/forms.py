@@ -125,7 +125,7 @@ WHERE substr(r.assigneeidentifier, 2)= '%s'%s;""" % (username,
                                                      self.get_sql_role_query_fragment(),
                                                      )
 
-    def get_sql02_direct_assignments(self, id_list_str="--- IDs from QUERY 1 ----"):
+    def get_sql02_direct_assignments(self, id_list_str="--- All IDs from QUERY 1 ----"):
 
         dvobject_type_fragment = ''
         if self.are_files_included():
@@ -150,7 +150,7 @@ WHERE substr(r.assigneeidentifier, 2)= '%s'%s;""" % (username,
 
         return sql_str
 
-    def get_sql03_indirect_datasets(self, id_list_str="--- IDs from QUERY 2 ----"):
+    def get_sql03_indirect_datasets(self, id_list_str="--- Dataverse IDs from QUERY 2 ----"):
         if (not self.are_datasets_included()) and (not self.are_files_included()):
             return None #('No query needed. Not looking for datasets or files')
 
@@ -161,7 +161,7 @@ WHERE substr(r.assigneeidentifier, 2)= '%s'%s;""" % (username,
 
         return sql_str
 
-    def get_sql04_indirect_files(self, id_list_str="--- IDs from Queries 2 and 3 ---"):
+    def get_sql04_indirect_files(self, id_list_str="--- Dataset IDs from Queries 2 and 3 ---"):
         if not self.are_files_included():
             return 'No query needed. Not looking for files'
 
