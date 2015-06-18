@@ -11,7 +11,7 @@
 
 <div class="row">
     <div class="col-md-5">
-    <form method="get" action="{% url 'view_solr_results' %}">
+    <form method="get" action="{% url 'view_solr_results_with_name' username %}">
         <table class="table table-condensed">
 
             {{ filter_form }}
