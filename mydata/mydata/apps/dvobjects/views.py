@@ -63,31 +63,12 @@ def view_solr_results(request, username=None):
 
                 pageHelper = PaginationHelper(solr_results.hits, solr_helper.NUM_DOC_RESULTS_RETURNED, selected_page)
                 d.update(pageHelper.get_pagination_dict())
-                """
-                page_count = solr_results.hits / solr_helper.NUM_DOC_RESULTS_RETURNED
-                msg('page_count: %d' % page_count)
-                if (solr_results.hits % solr_helper.NUM_DOC_RESULTS_RETURNED) > 0:
-                    page_count += 1
-                msg('page_count: %d' % page_count)
-                page_numbers = range(1, page_count+1)
 
-                card_start_num = (solr_helper.NUM_DOC_RESULTS_RETURNED * (selected_page - 1)) +1
-                #if selected_page > page_count:
-                #    selected_page = 1
-                """
-                #msgt(dir(solr_results))
-                msgt(solr_results.stats)
+                msgt('docs: ' % solr_results.docs)
+                msgt('stats: ' % solr_results.stats)
                 d.update({ 'pqh' : pqh,
                             'search_term' : search_term,
                            'solr_results' : solr_results,
-                           #'page_count' : page_count,
-                           #'page_numbers' : page_numbers,
-                           #'last_page' : page_numbers[-1],
-                           #'selected_page' : selected_page,
-                           #'prev_page' : max([selected_page-1, 1]),
-                           #'next_page' : min([selected_page+1, page_numbers[-1]]),
-                           #'card_start_num' : card_start_num,
-                           #'card_end_num' : min([card_start_num + 19, solr_results.hits])
                            })
                 print d
                 #msgt('filter_form: %s' % filter_form.cleaned_data)
