@@ -2,36 +2,39 @@
 {% for doc in solr_results.docs %}
     {% if doc.dvObjectType == 'dataverses' %}
         <div class="panel panel-default">
-          <div class="panel-heading">{{ doc.name }} (dataverse) <small>#{{ forloop.counter }}</small></div>
+          {#<div class="panel-heading">{{ doc.name }} (dataverse) <small>#{{ forloop.counter }}</small></div>#}
           <div class="panel-body">
                {% include "result_cards_publication_status.html" %}
-              <hr />
-              <p><b>dateFriendly:</b> {{ doc.dateFriendly }} - {{ doc.parentName }}</p>
-              <p><b>identifier:</b> {{ doc.identifier }}</p>
-              <p><b>description:</b> {{ doc.description }}</p>
-              <p><b>entityId:</b> {{ doc.entityId }}</p>
+                <div class="well">{{ doc.name }} (dataverse)</div>
 
-            <div class="well">{{ doc }}</div>
+              <small>
+              <b>dateFriendly:</b> {{ doc.dateFriendly }} - {{ doc.parentName }}
+              <br /><b>identifier:</b> {{ doc.identifier }}
+              <br /><b>description:</b> {{ doc.description }}
+              <br /><b>entityId:</b> {{ doc.entityId }}
+            </small>
+            {#<div class="well">{{ doc }}</div>#}
           </div>
         </div>
     {% endif %}
 
     {% if doc.dvObjectType == 'datasets' %}
         <div class="panel panel-default">
-          <div class="panel-heading">{{ doc.title }} (dataset) <small>#{{ forloop.counter }}</small></div>
+         {# <div class="panel-heading">{{ doc.title }} (dataset) <small>#{{ forloop.counter }}</small></div>#}
           <div class="panel-body">
                {% include "result_cards_publication_status.html" %}
 
-              <hr />
+  <div class="well">{{ doc.title }} (dataset)</div>
+                <small>
+               <b>dateFriendly:</b> {{ doc.dateFriendly }} - {{ doc.parentName }}
+               <br /><b>description:</b> {{ doc.dsDescriptionValue.0 }}
+               <br /><b>persistent id:</b> {{ doc.dsPersistentId }}
+               <br /><b>persistentUrl:</b> <a href="{{ doc.persistentUrl }}">{{ doc.persistentUrl }}</a>
+               <br /><b>publicationCitation:</b> {{ doc.publicationCitation.0 }}
+               <br /><b>entityId:</b> {{ doc.entityId }}
+                </small>
 
-               <p><b>dateFriendly:</b> {{ doc.dateFriendly }} - {{ doc.parentName }}</p>
-               <p><b>description:</b> {{ doc.dsDescriptionValue.0 }}</p>
-               <p><b>persistent id:</b> {{ doc.dsPersistentId }}</p>
-               <p><b>persistentUrl:</b> <a href="{{ doc.persistentUrl }}">{{ doc.persistentUrl }}</a></p>
-               <p><b>publicationCitation:</b> {{ doc.publicationCitation.0 }}</p>
-               <p><b>entityId:</b> {{ doc.entityId }}</p>
-
-            <div class="well">{{ doc }}</div>
+            {#<div class="well">{{ doc }}</div>#}
 
           </div>
         </div>
@@ -39,21 +42,21 @@
 
     {% if doc.dvObjectType == 'files' %}
         <div class="panel panel-default">
-          <div class="panel-heading">{{ doc.name }} (file) <small>#{{ forloop.counter }}</small></div>
           <div class="panel-body">
               {#{ doc }}<hr />#}
                {% include "result_cards_publication_status.html" %}
-
-              <hr />
-               <p><b>dataset:</b> {{ doc.parentName }}</p>
-               <p><b>persistentUrl:</b> <a href="{{ doc.persistentUrl }}">{{ doc.persistentUrl }}</a></p>
-               <p><b>dateFriendly:</b> {{ doc.dateFriendly }} </p>
-               <p><b>fileContentType:</b> {{ doc.fileContentType }}</p>
-               <p><b>fileType:</b> {{ doc.fileType }}</p>
-               <p><b>entityId:</b> {{ doc.entityId }}</p>
-             <p><b>fileMd5:</b> {{ doc.fileMd5 }}</p>
-               <p><b>fileSizeInBytes:</b> {{ doc.fileSizeInBytes|intcomma }}</p>
-            <div class="well">{{ doc }}</div>
+                    <div class="well">{{ doc.name }} (file) </div>
+                <small>
+               <b>dataset:</b> {{ doc.parentName }}
+               <br /><b>persistentUrl:</b> <a href="{{ doc.persistentUrl }}">{{ doc.persistentUrl }}</a>
+               <br /><b>dateFriendly:</b> {{ doc.dateFriendly }}
+               <br /><b>fileContentType:</b> {{ doc.fileContentType }}
+               <br /><b>fileType:</b> {{ doc.fileType }}
+               <br /><b>entityId:</b> {{ doc.entityId }}
+               <br /><b>fileMd5:</b> {{ doc.fileMd5 }}
+               <br /><b>fileSizeInBytes:</b> {{ doc.fileSizeInBytes|intcomma }}
+</small>
+            {#<div class="well">{{ doc }}</div>#}
 
           </div>
         </div>
