@@ -5,12 +5,13 @@ class PermissionsQueryHelper(object):
 
     SOLR_ID_GROUP_SIZE = 1000 # To not overwhelm the solr query OR statements
 
-    def __init__(self, username, filter_form):
+    def __init__(self, username, filter_form, page_num=1):
         assert filter_form is not None, "filter_form cannot be None"
         assert filter_form.cleaned_data is not None, "Only use for valid filter_form!"
 
         self.username = username
         self.filter_form = filter_form
+        self.page_num = page_num
 
         self.dvobject_direct_ids = []
         self.step1_query = None
@@ -262,6 +263,22 @@ class PermissionsQueryHelper(object):
 
         #self.are_files_included() or self.are_datasets_included() or self.are_dataverses_included(),
 
+
+    def format_ids_for_solr_clause(self, slice_of_ids, param_name='entityId'):
+
+        assert isinstance(slice_of_ids, list), 'id_list must be a list object'
+        assert param_name is not None, 'param_name cannot be None'
+
+        entity_list = [ str(x) for x in slice_of_ids]
+
+        # join them in a solr OR clause (space is separator)
+        or_clause = ' '.join(entity_list)
+
+        # wrap the Ids into an fq
+        qpart = '%s:(%s)' % (param_name, or_clause)
+
+        return qpart
+
     def build_id_query(self, id_list, param_name='entityId'):
         """
         SOLR cannot parse over 1024 items in a boolean clause
@@ -283,32 +300,31 @@ class PermissionsQueryHelper(object):
         #  exceeds SOLR_ID_GROUP_SIZE
         #-------------------------------------------
         for current_group_num in range(0, num_ids/self.SOLR_ID_GROUP_SIZE):
-
-            msg('add each part %s' % current_group_num)
+            # slice group of ids off
+            #
             slice_of_ids = id_list[id_cnt : self.SOLR_ID_GROUP_SIZE * (current_group_num+1)]
-            entity_list = [ str(x) for x in slice_of_ids]
-            id_cnt += len(entity_list)
 
-            or_clause = ' '.join(entity_list)
-            qpart = '%s:(%s)' % (param_name, or_clause)
-            qparts.append(qpart)
+            # add them to the count
+            #
+            id_cnt += len(slice_of_ids)
 
-            msg(qpart)
+            # format ids into solr OR clause
+            #
+            qparts.append(self.format_ids_for_solr_clause(slice_of_ids, param_name))
 
-        msg('id_cnt: %s' % id_cnt)
+
         #-------------------------------------------
         # Extra ids not evenly divisible by SOLR_ID_GROUP_SIZE
         #-------------------------------------------
         extra_id_count = num_ids % self.SOLR_ID_GROUP_SIZE
-        msg('extra_ids: %s' % extra_id_count)
-        if extra_id_count > 0:
-            msg('indices: %d:%d' % (id_cnt, (id_cnt+extra_id_count)))
-            slice_of_ids = id_list[id_cnt : (id_cnt + extra_id_count)]
-            entity_list = [ str(x) for x in slice_of_ids]
 
-            or_clause = ' '.join(entity_list)
-            qpart = '%s:(%s)' % (param_name, or_clause)
-            qparts.append(qpart)
+        if extra_id_count > 0:
+            # slice group of ids off
+            slice_of_ids = id_list[id_cnt : (id_cnt + extra_id_count)]
+
+            # format ids into solr OR clause
+            #
+            qparts.append(self.format_ids_for_solr_clause(slice_of_ids, param_name))
 
         qparts_fmt = [ '(%s)' % x for x in qparts]
 

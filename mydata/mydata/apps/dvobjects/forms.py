@@ -6,6 +6,7 @@ class MyDataFilterForm(forms.Form):
     Filtering for DvObjects related to the user
     """
 
+
     # ------------------------------------------------------
     # Publication statuses
     # ------------------------------------------------------
@@ -40,6 +41,7 @@ class MyDataFilterForm(forms.Form):
     search_term = forms.CharField(required=False)
 
     is_filter_form = forms.CharField(widget=forms.HiddenInput, initial=1)
+    page_num = forms.IntegerField(widget=forms.HiddenInput, initial=1)
 
     dvobject_types = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple,
                                              choices=DVOBJECT_TYPE_CHOICES,
@@ -60,6 +62,13 @@ class MyDataFilterForm(forms.Form):
             return '*'
 
         return st
+
+    def get_page_num(self):
+        assert self.cleaned_data is not None, "Only use this for valid forms!"
+        page_num = self.cleaned_data['page_num']
+        if page_num < 1:
+            return 1
+        return page_num
 
     def are_files_included(self):
         assert self.cleaned_data is not None, "Only use this for valid forms!"

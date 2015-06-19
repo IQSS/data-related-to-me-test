@@ -20,11 +20,16 @@ from apps.solr_docs.solr_results_handler import SolrResultsHandler
 
 class SolrHelper(object):
 
-    def __init__(self, d2me=None):
+    NUM_DOC_RESULTS_RETURNED = 20
 
-        self.d2me = d2me
 
-        self.solr_fq_query = None
+    def __init__(self, page_num=1):
+
+        # Set pages
+        self.result_start_offset = (page_num-1) * self.NUM_DOC_RESULTS_RETURNED
+
+        self.num_hits = 0
+
 
         self.has_err = False
         self.err_msg = None
@@ -34,15 +39,13 @@ class SolrHelper(object):
         self.err_msg = err_str
 
 
-    def make_solr_query(self, qstr, formatted_results=True):
+    def make_solr_query(self, qstr):
 
         solr = pysolr.Solr(settings.SOLR_URL, timeout=10)
-        searchFormatter = SolrSearchFormatter()
+        searchFormatter = SolrSearchFormatter(**dict(result_start_offset=self.result_start_offset,
+                                                     num_rows=self.NUM_DOC_RESULTS_RETURNED))
 
         solr_results = solr.search(qstr, **searchFormatter.get_solr_kwargs())
-
-        if formatted_results:
-            return SolrResultsHandler(solr_results)
 
         return solr_results
 
@@ -53,55 +56,22 @@ class SolrHelper(object):
 
 
 
-    def make_dataverse_query2(self, search_term, solr_fq_query):
+    def make_dataverse_query2(self, search_term, solr_fq_query, page_num=1):
 
         #solr_fq_query = 'dvobject_types:(dataverses OR datasets OR files)'
 
         solr = pysolr.Solr(settings.SOLR_URL, timeout=10)
 
-        searchFormatter = SolrSearchFormatter(**dict(fq=solr_fq_query))
+        searchFormatter = SolrSearchFormatter(**dict(fq=solr_fq_query,
+                                                     result_start_offset=self.result_start_offset,
+                                                     num_rows=self.NUM_DOC_RESULTS_RETURNED)
+                                              )
 
         solr_results = solr.search(search_term, **searchFormatter.get_solr_kwargs())
 
-        return solr_results
 
-    def make_dataverse_query(self):
-
-        self.solr_fq_query = self.get_dataverse_facet_query()
-
-        searchFormatter = SolrSearchFormatter(**dict(fq=self.solr_fq_query))
-
-        search_term = '*'
-
-        solr = pysolr.Solr(settings.SOLR_URL, timeout=10)
-
-        solr_kwargs =  searchFormatter.get_solr_kwargs()
-        solr_results = solr.search(search_term, **solr_kwargs)
 
         return solr_results
-
-    def get_dataverse_facet_query(self):
-        """
-        If there are dataverse ids, format the solr query string
-        """
-        assert isinstance(self.d2me, DataRelatedToMe), 'd2me must be a DataRelatedToMe object'
-
-        if self.d2me.all_dataverse_ids is None or len(self.d2me.all_dataverse_ids) == 0:
-            return None
-
-        self.d2me.all_dataverse_ids.remove(1)
-
-        fmt_list = [ str(x) for x in self.d2me.all_dataverse_ids]   # + self.d2me.initial_dataset_ids]
-
-        id_list = ' '.join(fmt_list)
-        #Columbian white-tailed deer
-        return '(entityId:(%s)) AND (publicationStatus:Unpublished) AND (dvObjectType:(dataverses OR datasets))' % (id_list) # AND (dvObjectType:datasets)' % (id_list, id_list)
-
-        return '(entityId:(%s)) OR (parentId:(%s))' % (id_list, id_list) # AND (dvObjectType:datasets)' % (id_list, id_list)
-
-        return '"Classical"'# AND (entityId:(%s)) OR (parentId:(%s)) AND (dvObjectType:datasets)' % (id_list, id_list)
-
-        #return '(dvObjectType:dataverses) AND (entityId:(%s))' % (' OR '.join(fmt_list))
 
 
 if __name__=='__main__':

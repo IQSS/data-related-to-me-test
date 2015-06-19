@@ -1,5 +1,23 @@
 {% extends "base.html" %}
 {% load humanize %}
+
+{% block extra_header_css_js %}
+<script>
+
+$(document).ready(function() {
+    $(".page_link").click(function(evt) {
+          evt.preventDefault(); // stop link from using href
+          var page_num = $(this).attr('rel');
+          //alert(page_num);
+         $('#id_page_num').val(page_num);
+        $('form#mydata_form').submit();
+//          alert(get_link(variable_name));
+    });
+});
+</script>
+{% endblock %}
+
+
 {% block maincontent %}
 <a name="top"></a>
 
@@ -11,7 +29,7 @@
 
 <div class="row">
     <div class="col-md-5">
-    <form method="get" action="{% url 'view_solr_results_with_name' username %}">
+    <form method="get" id="mydata_form" action="{% url 'view_solr_results_with_name' username %}">
         <table class="table table-condensed">
 
             {{ filter_form }}
@@ -34,6 +52,8 @@
         <hr />
         {% include "direct_indirect_table.html" %}
 
+
+
         <table class="table table-bordered table-condensed">
             <tr>
                 <th>Search&nbsp;term</th>
@@ -52,7 +72,6 @@
             <tr>
                 <th>facets</th>
                 <td>
-
                         {% for item in solr_results.facets.facet_fields.dvObjectType  %}
 
                             {% if forloop.counter|divisibleby:2 %}
@@ -67,7 +86,34 @@
                 </td>
             </tr></table>
 
-
+        Displaying results {{ card_start_num }} to {{ card_end_num }}
+        {% if page_count and page_count > 1 %}
+        <ul class="pagination">
+            {% if selected_page > 1 %}
+            <li>
+              <a aria-label="Previous" class="page_link" rel="{{ prev_page }}"><span aria-hidden="true">&laquo;</span></a>
+            </li>
+            <li>
+              <a aria-label="Previous" class="page_link" rel="{{ prev_page }}"><span aria-hidden="true">&lt; Previous</span></a>
+            </li>
+            {% endif %}
+                {% for pg in page_numbers %}
+                    {% if selected_page == pg %}
+                     <li class="active"><a rel="{{ pg }}" class="page_link">{{ pg }}</a></li>
+                    {% else %}
+                     <li><a rel="{{ pg }}" class="page_link">{{ pg }}</a></li>
+                    {% endif %}
+                {% endfor %}
+            {% if selected_page < last_page %}
+            <li>
+              <a href="#" aria-label="Next" class="page_link" rel="{{ next_page }}"><span aria-hidden="true">Next &gt;</span></a>
+            </li>
+            <li>
+              <a href="#" aria-label="Next" class="page_link" rel="{{ next_page }}"><span aria-hidden="true">&raquo;</span></a>
+            </li>
+            {% endif %}
+          </ul>
+        {% endif %}
 
         {% include "result_cards.html" %}
     {% endif %}
@@ -93,7 +139,7 @@
 
                 <b>Partial Solr FQ query (no ids):</b>
                 <div class="well">{{ filter_form.get_solr_facet_query }}</div>
-                <p><b>ID count:</b> {{ pqh.solr_query_id_list_count|intcomma }} </p>
+                <p><b>ID count:</b>  {{ pqh.solr_query_id_list_count|intcomma }} </p>
                 <b>Full Solr FQ query:</b>
                 <div class="well">{{ pqh.get_solr_fq_query }}</div>
           </div>
