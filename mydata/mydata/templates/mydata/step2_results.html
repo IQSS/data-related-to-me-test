@@ -86,30 +86,34 @@ $(document).ready(function() {
                 </td>
             </tr></table>
 
-        Displaying results {{ card_start_num }} to {{ card_end_num }}
+        {% if card_start_num == card_end_num %}
+            Displaying result {{ card_start_num }} of {{ solr_results.hits }}
+        {% else %}
+            Displaying results {{ card_start_num }} to {{ card_end_num }} of {{ solr_results.hits }}
+        {% endif %}
         {% if page_count and page_count > 1 %}
         <ul class="pagination">
-            {% if selected_page > 1 %}
+            {% if selected_page_num > 1 %}
             <li>
-              <a aria-label="Previous" class="page_link" rel="{{ prev_page }}"><span aria-hidden="true">&laquo;</span></a>
+              <a aria-label="First" class="page_link" rel="1"><span aria-hidden="true">&laquo;</span></a>
             </li>
             <li>
-              <a aria-label="Previous" class="page_link" rel="{{ prev_page }}"><span aria-hidden="true">&lt; Previous</span></a>
+              <a aria-label="Previous" class="page_link" rel="{{ prev_page_num }}"><span aria-hidden="true">&lt; Previous</span></a>
             </li>
             {% endif %}
-                {% for pg in page_numbers %}
-                    {% if selected_page == pg %}
+                {% for pg in page_number_list %}
+                    {% if selected_page_num == pg %}
                      <li class="active"><a rel="{{ pg }}" class="page_link">{{ pg }}</a></li>
                     {% else %}
                      <li><a rel="{{ pg }}" class="page_link">{{ pg }}</a></li>
                     {% endif %}
                 {% endfor %}
-            {% if selected_page < last_page %}
+            {% if selected_page_num < page_count %}
             <li>
-              <a href="#" aria-label="Next" class="page_link" rel="{{ next_page }}"><span aria-hidden="true">Next &gt;</span></a>
+              <a href="#" aria-label="Next" class="page_link" rel="{{ next_page_num }}"><span aria-hidden="true">Next &gt;</span></a>
             </li>
             <li>
-              <a href="#" aria-label="Next" class="page_link" rel="{{ next_page }}"><span aria-hidden="true">&raquo;</span></a>
+              <a href="#" aria-label="Last" class="page_link" rel="{{ page_count }}"><span aria-hidden="true">&raquo;</span></a>
             </li>
             {% endif %}
           </ul>

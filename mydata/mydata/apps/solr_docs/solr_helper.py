@@ -20,7 +20,7 @@ from apps.solr_docs.solr_results_handler import SolrResultsHandler
 
 class SolrHelper(object):
 
-    NUM_DOC_RESULTS_RETURNED = 20
+    NUM_DOC_RESULTS_RETURNED = 10
 
 
     def __init__(self, page_num=1):
