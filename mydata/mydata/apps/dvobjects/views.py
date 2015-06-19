@@ -57,12 +57,15 @@ def view_solr_results(request, username=None):
 
                 # Make the solr query
                 #
-                #solr_results = solr_helper.make_dataverse_query2(search_term, pqh.get_solr_fq_query())
-                solr_results = solr_helper.make_solr_query('*')
+                solr_results = solr_helper.make_dataverse_query2(search_term, pqh.get_solr_fq_query())
+                #solr_results = solr_helper.make_solr_query('*')
 
 
                 page_count = solr_results.hits / solr_helper.NUM_DOC_RESULTS_RETURNED
-                page_count += solr_results.hits % solr_helper.NUM_DOC_RESULTS_RETURNED
+                msg('page_count: %d' % page_count)
+                if (solr_results.hits % solr_helper.NUM_DOC_RESULTS_RETURNED) > 0:
+                    page_count += 1
+                msg('page_count: %d' % page_count)
                 page_numbers = range(1, page_count+1)
 
                 card_start_num = (solr_helper.NUM_DOC_RESULTS_RETURNED * (selected_page - 1)) +1
