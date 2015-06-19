@@ -65,7 +65,7 @@ $(document).ready(function() {
             </tr>
             <tr>
                 <th>Result{{ solr_results.hits|pluralize }}</th>
-                <td>{{ solr_results.hits }} card{{ solr_results.hits|length|pluralize }}{% if solr_results.hits > 0 %},
+                <td>{{ solr_results.hits }} card{{ solr_results.hits|pluralize }}{% if solr_results.hits > 0 %},
         showing {{ solr_results.docs|length }} card{{ solr_results.docs|length|pluralize }}
         {% endif %}</td>
             </tr>
