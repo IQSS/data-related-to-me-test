@@ -3,6 +3,8 @@ from apps.utils.msg_util import *
 
 class PermissionsQueryHelper(object):
 
+    SOLR_ID_GROUP_SIZE = 1000 # To not overwhelm the solr query OR statements
+
     def __init__(self, username, filter_form):
         assert filter_form is not None, "filter_form cannot be None"
         assert filter_form.cleaned_data is not None, "Only use for valid filter_form!"
@@ -43,6 +45,11 @@ class PermissionsQueryHelper(object):
         self.initial_file_ids = []
         self.all_file_ids = []
         self.secondary_file_ids = []
+
+        # -----------------------
+        # count of Ids used in solr query
+        # -----------------------
+        self.solr_query_id_list_count = 0
 
     def run_queries(self):
 
@@ -228,18 +235,21 @@ class PermissionsQueryHelper(object):
             parent_ids += self.all_dataset_ids
 
 
-
-
         entity_ids = set(entity_ids)
         parent_ids = set(parent_ids)
+
+        self.solr_query_id_list_count = len(entity_ids) + len(parent_ids)
+
         # e.g.  (entityId:(20 11 592 7 17 24 14 15 21 18 25 19 22 23 12 2 8 3 16 4 9 5 13 6 10))
         entity_id_clause = None
         if len(entity_ids) > 0:
-            entity_id_clause = """(entityId:(%s))""" % ' '.join(['%s' % x for x in entity_ids])
+            #entity_id_clause = """(entityId:(%s))""" % ' '.join(['%s' % x for x in entity_ids])
+            entity_id_clause = self.build_id_query(entity_ids, 'entityId')
 
         parent_id_clause = None
         if len(parent_ids) > 0:
-            parent_id_clause = """(parentId:(%s))""" % ' '.join(['%s' % x for x in parent_ids])
+            #parent_id_clause = """(parentId:(%s))""" % ' '.join(['%s' % x for x in parent_ids])
+            parent_id_clause = self.build_id_query(parent_ids, 'parentId')
 
         if entity_id_clause and parent_id_clause:
             return """(%s OR %s)""" % (entity_id_clause, parent_id_clause)
@@ -251,3 +261,56 @@ class PermissionsQueryHelper(object):
             return parent_id_clause
 
         #self.are_files_included() or self.are_datasets_included() or self.are_dataverses_included(),
+
+    def build_id_query(self, id_list, param_name='entityId'):
+        """
+        SOLR cannot parse over 1024 items in a boolean clause
+        Group IDs in batches of 1000
+        """
+        if id_list is None or len(id_list) == 0:
+            return None
+
+        # If this is a set, convert it to a list
+        if isinstance(id_list, set):
+            id_list = list(id_list)
+
+        num_ids = len(id_list)
+
+        qparts = []     # query clauses
+        id_cnt = 0
+        #-------------------------------------------
+        # Loop occurs if number of ids
+        #  exceeds SOLR_ID_GROUP_SIZE
+        #-------------------------------------------
+        for current_group_num in range(0, num_ids/self.SOLR_ID_GROUP_SIZE):
+
+            msg('add each part %s' % current_group_num)
+            slice_of_ids = id_list[id_cnt : self.SOLR_ID_GROUP_SIZE * (current_group_num+1)]
+            entity_list = [ str(x) for x in slice_of_ids]
+            id_cnt += len(entity_list)
+
+            or_clause = ' '.join(entity_list)
+            qpart = '%s:(%s)' % (param_name, or_clause)
+            qparts.append(qpart)
+
+            msg(qpart)
+
+        msg('id_cnt: %s' % id_cnt)
+        #-------------------------------------------
+        # Extra ids not evenly divisible by SOLR_ID_GROUP_SIZE
+        #-------------------------------------------
+        extra_id_count = num_ids % self.SOLR_ID_GROUP_SIZE
+        msg('extra_ids: %s' % extra_id_count)
+        if extra_id_count > 0:
+            msg('indices: %d:%d' % (id_cnt, (id_cnt+extra_id_count)))
+            slice_of_ids = id_list[id_cnt : (id_cnt + extra_id_count)]
+            entity_list = [ str(x) for x in slice_of_ids]
+
+            or_clause = ' '.join(entity_list)
+            qpart = '%s:(%s)' % (param_name, or_clause)
+            qparts.append(qpart)
+
+        qparts_fmt = [ '(%s)' % x for x in qparts]
+
+        return ' OR '.join(qparts_fmt)
+        #return '(%s)' % (' OR '.join(qparts_fmt))

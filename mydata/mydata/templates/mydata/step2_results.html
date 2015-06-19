@@ -93,7 +93,7 @@
 
                 <b>Partial Solr FQ query (no ids):</b>
                 <div class="well">{{ filter_form.get_solr_facet_query }}</div>
-
+                <p><b>ID count:</b> {{ pqh.solr_query_id_list_count|intcomma }} </p>
                 <b>Full Solr FQ query:</b>
                 <div class="well">{{ pqh.get_solr_fq_query }}</div>
           </div>
