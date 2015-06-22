@@ -330,3 +330,5 @@ class PermissionsQueryHelper(object):
 
         return ' OR '.join(qparts_fmt)
         #return '(%s)' % (' OR '.join(qparts_fmt))
+
+

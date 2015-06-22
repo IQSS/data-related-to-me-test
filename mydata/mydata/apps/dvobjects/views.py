@@ -7,6 +7,7 @@ from permissions_query_helper import PermissionsQueryHelper
 from .forms import MyDataFilterForm
 from apps.solr_docs.solr_helper import SolrHelper
 from apps.dvobjects.pager import PaginationHelper
+from apps.dvobjects.role_retriever import RoleRetriever
 
 # Create your views here.
 def view_default_query(request, username=None):
@@ -59,6 +60,9 @@ def view_solr_results(request, username=None):
                 # Make the solr query
                 #
                 solr_results = solr_helper.make_dataverse_query2(search_term, pqh.get_solr_fq_query())
+
+                if solr_results and solr_results.docs:
+                    role_retriever = RoleRetriever(solr_results.docs)
                 #solr_results = solr_helper.make_solr_query('*')
 
                 pageHelper = PaginationHelper(solr_results.hits, solr_helper.NUM_DOC_RESULTS_RETURNED, selected_page)
@@ -67,7 +71,7 @@ def view_solr_results(request, username=None):
                 msgt('docs: ' % solr_results.docs)
                 msgt('stats: ' % solr_results.stats)
                 d.update({ 'pqh' : pqh,
-                            'search_term' : search_term,
+                           'search_term' : search_term,
                            'solr_results' : solr_results,
                            })
                 print d
