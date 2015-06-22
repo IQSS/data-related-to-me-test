@@ -14,13 +14,11 @@ class RoleRetriever(object):
         assert solr_docs_as_dict is not None, "solr_docs_as_dict cannot be None"
 
         self.solr_docs = solr_docs_as_dict
+        self.formatted_solr_docs = None
 
         self.role_name_lookup = {}  # { role id : role name }
-
         self.final_doc_role_lookup = {}      # { dvobject ids of retrieved docs : [ role name, role name, role name] }
-
         self.dv_object_role_lookup = {}     # { dvobject id : [ role name, role name, role name]  }
-
         self.child_parent_map = {} # { dvobject id : parent dvobject id }
 
         self.err_found = False
@@ -68,9 +66,23 @@ class RoleRetriever(object):
 
         self.make_initial_queries()
 
+        # Make sure all the ids have roles assigned
         ids_without_roles = self.get_doc_ids_without_roles()
         if ids_without_roles and len(ids_without_roles) > 0:
             self.make_secondary_queries(ids_without_roles)
+
+        # Assign roles back to the docs
+        self.format_docs_with_roles()
+
+    def format_docs_with_roles(self):
+        assert self.solr_docs is not None, "self.solr_docs cannot be None"
+
+        self.formatted_solr_docs = []
+        for doc in self.solr_docs:
+            role_list = self.final_doc_role_lookup.get(doc[SOLR_ENTITY_ID])
+            doc.update(dict(role_list=role_list))
+            self.formatted_solr_docs.append(doc)
+
 
 
     def get_doc_ids_without_roles(self):
@@ -119,12 +131,63 @@ class RoleRetriever(object):
         """
         assert ids_without_roles is not None and len(ids_without_roles) > 0, "ids_without_roles has no values!"
 
-        pass
+        parent_ids = [self.child_parent_map.get(x, None) for x in ids_without_roles]
+        parent_ids = [str(x) for x in parent_ids if x is not None]
+
+        # Get grandparent ids, roles from dvobject table
+        #
+        qstr = """SELECT dv.id, dv.owner_id FROM dvobject WHERE dv.id IN ;""" % ','.join(parent_ids)
+        result_rows = self.get_query_results(qstr, no_dict=True)
+        if result_rows is None or len(result_rows)==0:
+            self.add_err_msg('No grandparent ids found for query')
+            return False
+
+        parent_grandparent_lookup = {}
+        for row in result_rows:
+            parent_id = row[0]
+            grandparent_id = row[1]
+            parent_grandparent_lookup[parent_id] = grandparent_id
+
+        # Get grandparent roles
+        #
+        qstr2 = """SELECT r.definitionpoint_id, r.role_id FROM roleassignment r"""
+        qstr2 += """ WHERE r.definitionpoint_id IN (%s);""" % (','.join(parent_grandparent_lookup.values()))
 
 
+        # Check for results
+        #
+        result_rows2 = self.get_query_results(qstr2, no_dict=True)
+        if result_rows2 is None or len(result_rows2)==0:
+            self.add_err_msg('No grandparent ids found for query')
+            return False
+
+        # Save results to lookup
+        #
+        for row in result_rows2:
+            entity_id = row[0]
+            role_name = self.role_name_lookup.get(row[1], 'Role id "%s" has no name' % row[1])
+
+            role_list = self.dv_object_role_lookup.get(entity_id, [])
+            if role_name not in role_list:
+                self.dv_object_role_lookup.setdefault(entity_id, []).append(role_name)
+
+        # get/assign roles
+        #
+        for no_role_id in ids_without_roles:
+            # get parent id
+            parent_id = self.child_parent_map.get(no_role_id, None)
+            if parent_id is None:
+                continue
+
+            # get grandparent id + roles
+            role_list = self.dv_object_role_lookup.get(parent_grandparent_lookup.get(parent_id, 'nada'), None)
+            if role_list is not None:
+                self.final_doc_role_lookup[no_role_id] = role_list
 
     def load_roles_to_final_dict(self):
-        """May be called multiple times"""
+        """
+        Check if roles have been assigned to the dvObject or to the dvObject's parent
+        """
 
         updated_role_lookup = {}
 

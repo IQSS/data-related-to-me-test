@@ -1,10 +1,12 @@
 {% load humanize %}
-{% for doc in solr_results.docs %}
+{#% for doc in solr_results.docs %#}
+{% for doc in formatted_solr_docs %}
     {% if doc.dvObjectType == 'dataverses' %}
         <div class="panel panel-default">
           {#<div class="panel-heading">{{ doc.name }} (dataverse) <small>#{{ forloop.counter }}</small></div>#}
           <div class="panel-body">
                {% include "result_cards_publication_status.html" %}
+               {% include "result_card_roles.html" %}
                 <div class="well">{{ doc.name }} (dataverse)</div>
 
               <small>
@@ -23,6 +25,7 @@
          {# <div class="panel-heading">{{ doc.title }} (dataset) <small>#{{ forloop.counter }}</small></div>#}
           <div class="panel-body">
                {% include "result_cards_publication_status.html" %}
+               {% include "result_card_roles.html" %}
 
   <div class="well">{{ doc.title }} (dataset)</div>
                 <small>
@@ -45,6 +48,8 @@
           <div class="panel-body">
               {#{ doc }}<hr />#}
                {% include "result_cards_publication_status.html" %}
+             {% include "result_card_roles.html" %}
+
                     <div class="well">{{ doc.name }} (file) </div>
                 <small>
                <b>dataset:</b> {{ doc.parentName }}

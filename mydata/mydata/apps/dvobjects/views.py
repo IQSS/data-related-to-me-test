@@ -60,9 +60,12 @@ def view_solr_results(request, username=None):
                 # Make the solr query
                 #
                 solr_results = solr_helper.make_dataverse_query2(search_term, pqh.get_solr_fq_query())
+                formatted_solr_docs = None
 
                 if solr_results and solr_results.docs:
                     role_retriever = RoleRetriever(solr_results.docs)
+                    formatted_solr_docs = role_retriever.formatted_solr_docs
+                    #msgx(formatted_solr_docs)
                 #solr_results = solr_helper.make_solr_query('*')
 
                 pageHelper = PaginationHelper(solr_results.hits, solr_helper.NUM_DOC_RESULTS_RETURNED, selected_page)
@@ -73,6 +76,7 @@ def view_solr_results(request, username=None):
                 d.update({ 'pqh' : pqh,
                            'search_term' : search_term,
                            'solr_results' : solr_results,
+                           'formatted_solr_docs' : formatted_solr_docs,
                            })
                 print d
                 #msgt('filter_form: %s' % filter_form.cleaned_data)

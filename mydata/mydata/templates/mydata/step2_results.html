@@ -120,8 +120,9 @@ $(document).ready(function() {
         {% endif %}
 
     {% endif %}
-        {% include "result_cards.html" %}
-
+        {% if formatted_solr_docs %}
+            {% include "result_cards.html" %}
+        {% endif %}
     </div>
 </div>
 <div class="row">
