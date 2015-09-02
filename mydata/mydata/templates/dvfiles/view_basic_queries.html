@@ -7,7 +7,7 @@
 <hr />
 
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-3">
         <div class="panel panel-default">
             <div class="panel-heading">  Dataset List (<a href="#top">top</a>)</div>
             <div class="panel-body">
@@ -39,7 +39,7 @@
         </div>
     </div>
     {% if filemetadata_list %}
-    <div class="col-md-6">
+    <div class="col-md-9">
         <div class="panel panel-default">
             <div class="panel-heading">File List
                     <br />for Dataset Version ID
@@ -49,8 +49,11 @@
                     <thead>
                         <th>&nbsp;</th>
                         <th>label/name</th>
-                        <th>filemetatdata id</th>
-                        <th>datafile id</th>
+                        <th>filemetatdata id<br />datafile id</th>
+                        <th>content type<br />
+                            md5<br />
+                            file size
+                        </th>
                         <th>description</th>
                     </thead>
                 {% for fm in filemetadata_list %}
@@ -58,11 +61,19 @@
                         <td>{{ forloop.counter }}</td>
                         <td>{{ fm.label }}
                             {% if fm.tags %}
-                               <br /><small>{{ fm.tags|join:" // " }}</small>
+
+                               <br /><small>
+                                {% for t in fm.tags %}
+                                    <span class="label label-primary">{{ t }}</span>
+                                {% endfor %}
+                                </small>
                             {% endif %}
                         </td>
-                        <td>{{ fm.id }}</td>
-                        <td>{{ fm.datafile_id }}</td>
+                        <td>{{ fm.id }}<br />{{ fm.datafile_id }}</td>
+                        <td>{{ fm.datafile_info.contenttype }}<br />
+                            {{ fm.datafile_info.md5 }}<br />
+                            {{ fm.datafile_info.filesize }}
+                        </td>
                         <td>{% if fm.description %}{{ fm.description|truncatewords:5 }}{% else %}(n/a){% endif %}</td>
                     </tr>
                 {% endfor %}

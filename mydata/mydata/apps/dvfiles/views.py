@@ -11,17 +11,24 @@ from apps.utils.msg_util import *
 #from apps.dvobjects.pager import PaginationHelper
 #from apps.dvobjects.role_retriever import RoleRetriever
 
-class DatasetVersionInfo(object):
+class DictInfo(object):
 
     def __init__(self, **kwargs):
         for k, v in kwargs.items():
             self.__dict__[k] = v
 
-class FileMetadataInfo(object):
 
-    def __init__(self, **kwargs):
-        for k, v in kwargs.items():
-            self.__dict__[k] = v
+class DatasetVersionInfo(DictInfo):
+    pass
+
+class FileMetadataInfo(DictInfo):
+    pass
+
+class DataFile(DictInfo):
+    pass
+
+
+
 
 # Create your views he
 # re.
@@ -69,19 +76,55 @@ def get_file_metadata_list(dv_id):
     if result_rows is None or len(result_rows)==0:
         return None
 
+    # ---------------------------------
+    # Use the FileMetadata ids to retrieve Tags
+    # ---------------------------------
     file_metadata_ids = [ '%s' % row['id'] for row in result_rows]
     print 'file_metadata_ids', file_metadata_ids
     tag_lookup = get_file_tag_lookup(file_metadata_ids)
     if tag_lookup is None:
         tag_lookup = {}
 
+    # ---------------------------------
+    # Use the Data File ids to retrieve ContentType, MD5, Filesize
+    # ---------------------------------
+    datafile_ids = [ '%s' % row['datafile_id'] for row in result_rows]
+    print 'datafile_ids', datafile_ids
+    datafile_lookup = get_datafile_lookup(datafile_ids)
+    if datafile_lookup is None:
+        datafile_lookup = {}
+
+    # ---------------------------------
     filemetadata_list = []
     for row in result_rows:
         fm_info = FileMetadataInfo(**row)
         fm_info.tags = tag_lookup.get(fm_info.id, None)
+        fm_info.datafile_info = datafile_lookup.get(fm_info.datafile_id)
         filemetadata_list.append(fm_info)
 
     return filemetadata_list
+
+def get_datafile_lookup(datafile_ids):
+    if datafile_ids is None or len(datafile_ids) == 0:
+        return None
+
+    qstr = """SELECT df.*
+       FROM datafile df
+       WHERE df.id IN (%s);"""\
+           % (",".join(datafile_ids))
+
+    result_rows = get_query_results(qstr)
+    if result_rows is None or len(result_rows)==0:
+        return None
+
+    #print 'datafile info', result_rows
+
+    df_lookup = {} # { filemetadata id : [ name, name, name]}
+    for row in result_rows:
+        df_lookup[row['id']] = DataFile(**row)
+
+    return df_lookup
+
 
 
 def get_file_tag_lookup(file_metadata_ids):
