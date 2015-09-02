@@ -29,7 +29,10 @@ class RoleRetriever(object):
             self.retrieve_roles()
 
     def load_role_names(self):
-
+        """
+        Read full dataverserole table
+        Create look up of { role_id : role name }
+        """
         msgt('load_role_names')
 
         qstr = """SELECT id, name FROM dataverserole;"""
@@ -51,7 +54,8 @@ class RoleRetriever(object):
 
         # For the retrieved Solr docs, start populating:
         #   (1) role_lookup - just the keys
-        #   (2) child_parent_map0.
+        #   (2) child_parent_map
+        #   (3) if files, make child_grandparent_map
         #
         for doc in self.solr_docs:
             assert SOLR_ENTITY_ID in doc, "Solr doc MUST haven an %s" % SOLR_ENTITY_ID
@@ -60,7 +64,9 @@ class RoleRetriever(object):
             #print(doc)
             self.child_parent_map[doc[SOLR_ENTITY_ID]] = int(doc[SOLR_PARENT_ID])
             self.final_doc_role_lookup.setdefault(doc[SOLR_ENTITY_ID], [])
-
+            if doc[MyDataFilterForm.SOLR_DVOBJECT_TYPE] == MyDataFilterForm.SOLR_FILES_LABEL:
+                pass
+                # get child
 
         print ('child_parent_map: %s' % self.child_parent_map)
 
@@ -197,32 +203,37 @@ class RoleRetriever(object):
             msg('check final id[%s] roles[%s]' % (entity_id, role_list))
             # Are roles already assigned for this id?
             #
-            if role_list is not None and len(role_list) > 0:
-                continue    # yes, go to next id
+            if role_list is None or len(role_list) > 0:
+                role_list = []
 
-            # No, get them
+            # Get directly assigned roles
             #
             role_names = self.dv_object_role_lookup.get(entity_id)
             if role_names and len(role_names) > 0:
-                msg('role names for [%s] [%s]' % (entity_id, role_names))
+                msg('(a) directly assigned role names for [%s] [%s]' % (entity_id, role_names))
                 # Got them!  Make update and move on
-                updated_role_lookup[entity_id] = role_names
-                continue
+                role_list += role_names
 
-            # Didn't have direct roles assigned.  Does the parent have roles?
+            # Get roles assigned through parent
             #
             parent_id = self.child_parent_map.get(entity_id, None)
             if parent_id is not None:
+                # get role names assigned to parent
                 role_names = self.dv_object_role_lookup.get(parent_id)
                 if role_names and len(role_names) > 0:
-                    msg('role names for [%s] [%s]' % (entity_id, role_names))
+                    role_list += role_names
+                    msg('(b) parent assigned role names for [%s] [%s]' % (entity_id, role_names))
                     # Got them!  Make update and move on
-                    updated_role_lookup[entity_id] = role_names
-                    continue
+
+            # Get roles assigned through grandparent
+            #
+
+            updated_role_lookup[entity_id] = role_list
 
 
         msg('updated_role_lookup: %s' % updated_role_lookup)
         # Update final_doc_role_lookup with updated_role_lookup
+        #
         for entity_id, role_list in updated_role_lookup.items():
             self.final_doc_role_lookup[entity_id] = role_list
 

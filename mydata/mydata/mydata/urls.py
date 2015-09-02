@@ -8,5 +8,9 @@ urlpatterns = [
     # url(r'^$', 'mydata.views.home', name='home'),
      url(r'^step1/', include('apps.dvobjects.urls')),
 
+     url(r'^files/', include('apps.dvfiles.urls')),
+
+     url(r'^preview/', include('apps.preview.urls')),
+
     url(r'^mydata-admin/', include(admin.site.urls)),
 ]

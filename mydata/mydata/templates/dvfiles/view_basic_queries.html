@@ -1,0 +1,80 @@
+{% extends "dvfiles/base.html" %}
+{% load humanize %}
+{% block maincontent %}
+<a name="top"></a>
+
+<h1>DV Files</h1>
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="panel panel-default">
+            <div class="panel-heading">  Dataset List (<a href="#top">top</a>)</div>
+            <div class="panel-body">
+
+
+                <table class="table table-bordered table-condensed">
+                    <thead>
+                        <th>ds version id</th>
+                        <th>dataset id</th>
+                        <th>file count</th>
+                    </thead>
+                {% for dv in dv_info_list %}
+                    <tr>
+                        <td>
+
+                            {% if selected_datasetversion_id == dv.id %}
+                                <h3><span class="label label-success">{{ dv.id }}</span></h3>
+                            {% else %}
+                                <a href="{% url 'view_basic_queries_by_dv_id' dv.id %}">{{ dv.id }}</a>
+                            {% endif %}
+
+                        </td>
+                        <td>{{ dv.dataset_id }}</td>
+                        <td>{{ dv.fcnt }}</td>
+                    </tr>
+                {% endfor %}
+                </table>
+            </div>
+        </div>
+    </div>
+    {% if filemetadata_list %}
+    <div class="col-md-6">
+        <div class="panel panel-default">
+            <div class="panel-heading">File List
+                    <br />for Dataset Version ID
+                        <span class="label label-success">{{ selected_datasetversion_id }}</span></div>
+            <div class="panel-body">
+                 <table class="table table-bordered table-condensed">
+                    <thead>
+                        <th>&nbsp;</th>
+                        <th>label/name</th>
+                        <th>filemetatdata id</th>
+                        <th>datafile id</th>
+                        <th>description</th>
+                    </thead>
+                {% for fm in filemetadata_list %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ fm.label }}
+                            {% if fm.tags %}
+                               <br /><small>{{ fm.tags|join:" // " }}</small>
+                            {% endif %}
+                        </td>
+                        <td>{{ fm.id }}</td>
+                        <td>{{ fm.datafile_id }}</td>
+                        <td>{% if fm.description %}{{ fm.description|truncatewords:5 }}{% else %}(n/a){% endif %}</td>
+                    </tr>
+                {% endfor %}
+                </table>
+            </div>
+        </div>
+    </div>
+
+    {% endif %}
+</div>
+
+
+
+
+{% endblock %}
