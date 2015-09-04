@@ -59,7 +59,9 @@ def view_basic_queries(request, dv_id=None):
     # Specific file list
     # ----------------------------------------
     d['filemetadata_list'] = get_file_metadata_list(dv_id)
-    d['selected_datasetversion_id'] = int(dv_id)
+    d['selected_datasetversion_id'] = int(dv_id) if dv_id is not None else None
+    #> 10 else c
+    #    int(dv_id)
 
     return render_to_response('dvfiles/view_basic_queries.html', d)
 
@@ -68,9 +70,10 @@ def get_file_metadata_list(dv_id):
     if dv_id is None:
         return None
 
-    qstr2 = """Select fm.*
-        from filemetadata fm
-        where datasetversion_id = %s;""" % (dv_id)
+    qstr2 = \
+"""SELECT fm.*
+FROM filemetadata fm
+WHERE datasetversion_id = %s;""" % (dv_id)
 
     result_rows = get_query_results(qstr2)
     if result_rows is None or len(result_rows)==0:
@@ -104,14 +107,72 @@ def get_file_metadata_list(dv_id):
 
     return filemetadata_list
 
+
+"""
+SLOW:
+ SELECT fm.*, df.*
+FROM filemetadata fm,
+  datafile df
+WHERE fm.datafile_id = df.id
+and fm.datasetversion_id =61446;
+---------------------------------------
+EXPLAIN ANALYZE
+SELECT fm.*, df.*
+FROM filemetadata fm,
+  datafile df
+WHERE fm.datasetversion_id =61446
+AND fm.datafile_id = df.id;
+---------------------------------------
+EXPLAIN ANALYZE select fm.*
+from filemetadata fm
+WHERE fm.datasetversion_id =61446;
+
+---------------------------------------
+explain analyze select df.*
+from datafile df
+where df.id = 2274797;
+---------------------------------------
+explain analyze select dv.*
+from dvobject dv
+where dv.id = 2274797;
+---------------------------------------
+OK - DvObject + DataFile
+explain analyze select dv.*, df.*
+from datafile df,
+dvobject dv
+where dv.id=2274797
+and dv.id = df.id;
+
+
+
+
+explain ANALYZE SELECT fm.*, df.*, dv.*
+FROM filemetadata fm,
+  datafile df,
+  dvobject dv
+WHERE fm.datafile_id = df.id
+AND dv.id = df.id
+and fm.datasetversion_id =61446;
+38001
+
+# dataset versions with the most files
+select fm.datasetversion_id, count(fm.id) as cnt
+from filemetadata fm
+group by fm.datasetversion_id
+order by cnt desc
+limit 100;
+
+"""
+
 def get_datafile_lookup(datafile_ids):
     if datafile_ids is None or len(datafile_ids) == 0:
         return None
 
-    qstr = """SELECT df.*
-       FROM datafile df
-       WHERE df.id IN (%s);"""\
-           % (",".join(datafile_ids))
+    qstr = \
+"""SELECT df.*
+FROM datafile df
+WHERE df.id IN (%s);"""\
+   % (",".join(datafile_ids))
 
     result_rows = get_query_results(qstr)
     if result_rows is None or len(result_rows)==0:
@@ -131,12 +192,13 @@ def get_file_tag_lookup(file_metadata_ids):
     if file_metadata_ids is None or len(file_metadata_ids) == 0:
         return None
 
-    qstr = """SELECT fm_cat.filemetadatas_id, cat.name
-       FROM filemetadata_datafilecategory fm_cat,
-            datafilecategory cat
-       WHERE fm_cat.filemetadatas_id IN (%s)
-       AND fm_cat.filecategories_id = cat.id
-       ORDER BY cat.name;""" \
+    qstr = \
+"""SELECT fm_cat.filemetadatas_id, cat.name
+FROM filemetadata_datafilecategory fm_cat,
+    datafilecategory cat
+WHERE fm_cat.filemetadatas_id IN (%s)
+AND fm_cat.filecategories_id = cat.id
+ORDER BY cat.name;""" \
            % (",".join(file_metadata_ids))
 
     result_rows = get_query_results(qstr)
